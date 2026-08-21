@@ -1,0 +1,105 @@
+<!--
+  Add these inside the <manifest> tag (permissions) and inside the
+  <application> tag (service + activity), in
+  android/app/src/main/AndroidManifest.xml, after running `flutter create .`.
+-->
+
+<!-- Inside <manifest>, as a sibling of <application> (Android 11+ package visibility): -->
+<queries>
+    <intent>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+    </intent>
+</queries>
+
+<!-- Inside <manifest>, as a sibling of <application>: -->
+<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.RECORD_AUDIO" />
+<uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" tools:ignore="ProtectedPermissions" />
+<!-- PACKAGE_USAGE_STATS is a "special" permission -- like Accessibility,
+     it can't be requested via a runtime dialog; the user has to enable it
+     themselves in Settings (see UsageAccessScreen /
+     OneirPermissions.openUsageAccessSettings()). Declaring it here is
+     required for the app to even query its own granted status. -->
+<!-- Needed for voice input (speech_to_text). RECORD_AUDIO is a runtime
+     (dangerous) permission on Android 6+, so declaring it here is only
+     half the story -- the app still needs to request it at runtime before
+     the first mic tap. speech_to_text's initialize() call handles that
+     request itself; no extra platform-channel code needed beyond this
+     manifest entry, but the user will see the system's real "Allow Oneir
+     to record audio?" dialog the first time they tap the mic. -->
+
+<!--
+  Inside <application>, alongside the existing <activity android:name=".MainActivity">
+  entry that `flutter create .` already generated:
+-->
+<service
+    android:name=".OneirAccessibilityService"
+    android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
+    android:exported="false">
+    <intent-filter>
+        <action android:name="android.accessibilityservice.AccessibilityService" />
+    </intent-filter>
+    <meta-data
+        android:name="android.accessibilityservice"
+        android:resource="@xml/oneir_accessibility_service_config" />
+</service>
+
+<activity
+    android:name=".InterruptionActivity"
+    android:exported="false"
+    android:excludeFromRecents="true"
+    android:launchMode="singleTop"
+    android:theme="@style/LaunchTheme" />
+
+<!--
+  Also required: enable passing arguments to a custom Dart entrypoint
+  (InterruptionActivity.getDartEntrypointArgs() -> interruptionMain(args)).
+  Add this <meta-data> tag inside <application> too:
+-->
+<meta-data
+    android:name="io.flutter.embedding.android.EnableDartEntrypointArgs"
+    android:value="true" />
+
+<!--
+  Widget receivers -- also inside <application>, one per widget concept.
+  Their layout/drawable XML lives in android_native_files/widgets/{layout,drawable,xml}/
+  and needs copying into android/app/src/main/res/{layout,drawable,xml}/
+  respectively; their Kotlin classes into the same package folder as
+  MainActivity.kt. Full copy-paste checklist in SETUP.md.
+-->
+<receiver
+    android:name=".TodaysFocusWidgetProvider"
+    android:exported="false">
+    <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+    </intent-filter>
+    <meta-data
+        android:name="android.appwidget.provider"
+        android:resource="@xml/todays_focus_widget_info" />
+</receiver>
+
+<receiver
+    android:name=".QuickFocusWidgetProvider"
+    android:exported="false">
+    <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+    </intent-filter>
+    <meta-data
+        android:name="android.appwidget.provider"
+        android:resource="@xml/quick_focus_widget_info" />
+</receiver>
+
+<receiver
+    android:name=".VanyaCheckInWidgetProvider"
+    android:exported="false">
+    <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+    </intent-filter>
+    <meta-data
+        android:name="android.appwidget.provider"
+        android:resource="@xml/vanya_checkin_widget_info" />
+</receiver>
+

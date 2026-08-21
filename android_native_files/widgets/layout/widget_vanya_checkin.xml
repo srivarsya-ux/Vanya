@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/oneir_widget_background"
+    android:orientation="vertical"
+    android:padding="14dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Vanya"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:textColor="#2F2E2E"
+        android:layout_marginBottom="6dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="What's one thing you want to get done today?"
+        android:textSize="13sp"
+        android:textColor="#4A4A4A"
+        android:layout_marginBottom="10dp" />
+
+    <TextView
+        android:id="@+id/check_in_add_task_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="+ Add task"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:background="@drawable/oneir_widget_pill_button"
+        android:paddingStart="14dp"
+        android:paddingEnd="14dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp" />
+
+</LinearLayout>

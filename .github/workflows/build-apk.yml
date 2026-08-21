@@ -1,0 +1,88 @@
+name: Build Oneir APK
+
+# Builds a real, installable debug APK with every native feature wired in
+# -- accessibility service, interruption overlay, home-screen widgets, all
+# the OS permission plumbing -- not just the bare Flutter UI. This exists
+# because the repo intentionally ships without an android/ folder (see
+# android_native_files/SETUP.md); this workflow does everything that
+# doc's steps 1-3 describe by hand, automatically, on every run.
+#
+# Manual trigger: go to the Actions tab on GitHub, pick "Build Oneir APK"
+# in the left sidebar, click "Run workflow". When it finishes, open the
+# run and download the "oneir-debug-apk" artifact at the bottom -- that's
+# a .zip containing app-debug.apk. Unzip it, copy the .apk to your phone
+# (e.g. via a cloud drive or USB), and tap it to install (you'll need to
+# allow "install unknown apps" for whatever app you use to open it).
+#
+# This is a DEBUG build: no Firebase project and no Anthropic API key are
+# configured by default, so Co-Keeper's push notifications and Vanya's AI
+# replies both fall back to their honest, fully-functional non-network
+# defaults (Firebase features silently disabled, AI decisions handled by
+# OfflineHeuristicProvider) -- see the repo's README/SETUP.md for how to
+# wire in real Firebase + Anthropic once you have both accounts. Nothing
+# about that fallback is a stub or a mock: it's real code that runs for
+# real, just simpler than the AI-backed path until those are configured.
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Flutter doctor
+        run: flutter doctor -v
+
+      - name: Generate Android platform folder
+        # Safe on an existing project -- fills in the missing android/
+        # (and ios/, harmlessly) without touching lib/ or pubspec.yaml.
+        # --org com.oneir --project-name app is deliberate: it's what
+        # makes the generated applicationId come out as com.oneir.app,
+        # matching every `package com.oneir.app` line in
+        # android_native_files/**/*.kt. Changing either value breaks that
+        # match -- see tool/wire_native.py's verify_package_dir().
+        run: flutter create . --platforms android --org com.oneir --project-name app
+
+      - name: Wire in native Kotlin/XML files
+        run: python3 tool/wire_native.py
+
+      - name: Install Flutter packages
+        run: flutter pub get
+
+      - name: Static analysis (non-blocking -- surfaces warnings without failing the build)
+        run: flutter analyze || true
+
+      - name: Build debug APK
+        # --dart-define=AI_PROVIDER=cloud makes Vanya's replies call the
+        # deployed decideIntervention Cloud Function instead of falling
+        # back to OfflineHeuristicProvider. This only actually does
+        # anything once you've deployed the function (firebase deploy
+        # --only functions:decideIntervention) and committed a real
+        # android_native_files/google-services.json -- until then the app
+        # still builds and runs fine, the callable call just fails per-call
+        # and CloudFunctionInterventionProvider falls back to its own
+        # honest "having trouble thinking" clarify reply. See SETUP.md 4b.
+        run: flutter build apk --debug --dart-define=AI_PROVIDER=cloud
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: oneir-debug-apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
+          if-no-files-found: error

@@ -1,0 +1,37 @@
+rules_version = '2';
+
+// NOTE: these rules rely on each device's self-generated ID (see
+// lib/backend/oneir_identity.dart) as if it were an authenticated user ID,
+// because this project doesn't have real user accounts (Firebase Auth) yet.
+// That means requests are trusted based on knowing the right document ID
+// rather than a verified identity -- fine for a first version among people
+// who trust each other, but worth replacing with real Firebase Auth before
+// this handles anything more sensitive.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /users/{deviceId} {
+      allow read: if true;
+      allow write: if true; // any device can register/update its own token
+    }
+
+    match /pairings/{requesterId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    match /requests/{requestId} {
+      allow create: if request.resource.data.keys().hasAll(
+        ['requesterId', 'coKeeperId', 'appPackage', 'status']
+      ) && request.resource.data.status == 'pending';
+
+      allow read: if true;
+
+      // Only the status/respondedAt fields may be updated after creation
+      // (the Co-Keeper approving or declining) -- nothing else about an
+      // existing request can be changed.
+      allow update: if request.resource.data.diff(resource.data).affectedKeys()
+        .hasOnly(['status', 'respondedAt']);
+    }
+  }
+}

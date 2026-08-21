@@ -1,0 +1,47 @@
+workflows:
+  android-workflow:
+    name: Oneir Android Build
+    max_build_duration: 60
+    environment:
+      flutter: stable
+      vars:
+        PACKAGE_NAME: "com.oneir.app"
+    scripts:
+      - name: Generate Android platform files (repo has no android/ folder yet)
+        script: |
+          if [ ! -d "android" ]; then
+            # --project-name must be "app" (not "oneir") -- org + project
+            # name is what Flutter concatenates into the applicationId, so
+            # this combination is what makes it come out as com.oneir.app,
+            # matching every `package com.oneir.app` line in
+            # android_native_files/**/*.kt. Using "oneir" here (an earlier
+            # version of this file did) produces com.oneir.oneir instead,
+            # which silently breaks the native wiring step below -- the
+            # Kotlin files land in the wrong package directory relative to
+            # what they declare.
+            flutter create . --platforms android --org com.oneir --project-name app
+          fi
+      - name: Wire in native Kotlin/XML files (accessibility service, interruption overlay, widgets)
+        script: |
+          # This step was missing from an earlier version of this file --
+          # without it, the build below produces a bare, working-looking
+          # Flutter shell with none of the actual app-blocking/widget
+          # functionality wired in (no manifest permissions, no
+          # AccessibilityService, no widget receivers). See
+          # tool/wire_native.py and android_native_files/SETUP.md for what
+          # this does and why it's needed.
+          python3 tool/wire_native.py
+      - name: Get Flutter packages
+        script: |
+          flutter pub get
+      - name: Build APK (debug -- shows real errors on-device instead of a silent freeze)
+        script: |
+          # --dart-define=AI_PROVIDER=cloud routes Vanya's replies through
+          # the deployed decideIntervention Cloud Function. Harmless if you
+          # haven't deployed it yet or added a real google-services.json --
+          # the app still builds and runs, calls just fall back to
+          # CloudFunctionInterventionProvider's honest clarify reply. See
+          # android_native_files/SETUP.md section 4b.
+          flutter build apk --debug --dart-define=AI_PROVIDER=cloud
+    artifacts:
+      - build/app/outputs/flutter-apk/*.apk
