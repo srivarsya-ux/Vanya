@@ -1,0 +1,35 @@
+# These folders are all generated on every CI run (see codemagic.yaml /
+# .github/workflows/build-apk.yml, which run `flutter create .` and
+# `flutter pub get` fresh each time) -- they should never be committed.
+#
+# This repo went without a .gitignore for a while, which let real
+# build/.dart_tool/android folders from local Flutter runs get swept into
+# a `git add -A` and pushed by accident. Once committed, the CI workflow's
+# `if [ ! -d "android" ]` check saw that stale android/ folder already
+# "existed" and skipped regenerating it -- and Flutter's own incremental
+# build system can treat old compiled output in a stale build/ folder as
+# still valid, silently ignoring real lib/ source changes. That's the
+# actual explanation for builds that looked successful but never reflected
+# new code.
+.dart_tool/
+.packages
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+pubspec.lock
+
+# Generated native platform projects -- intentionally NOT committed (see
+# android_native_files/SETUP.md); CI regenerates them fresh every run via
+# `flutter create .` and then wires in the real native files on top.
+android/
+ios/
+linux/
+macos/
+windows/
+web/
+
+*.iml
+.idea/
+.vscode/

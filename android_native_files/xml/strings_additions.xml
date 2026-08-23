@@ -1,0 +1,16 @@
+<!--
+  Add this string inside android/app/src/main/res/values/strings.xml (create
+  the file if `flutter create .` didn't generate one - it's just a plain
+  <resources> file). Referenced by oneir_accessibility_service_config.xml,
+  and shown to the user on Android's Accessibility settings screen as the
+  service description.
+-->
+<resources>
+    <string name="oneir_accessibility_service_description">
+        Lets Vanya notice when you open a protected app, so she can check in
+        before you start scrolling. Oneir never reads what\'s on your screen.
+    </string>
+    <string name="widget_todays_focus_description">Today\'s Focus -- see your top 3 tasks at a glance</string>
+    <string name="widget_quick_focus_description">Quick Focus -- start a 25-minute session with one tap</string>
+    <string name="widget_checkin_description">Vanya Daily Check-in -- add a task without opening the app</string>
+</resources>
