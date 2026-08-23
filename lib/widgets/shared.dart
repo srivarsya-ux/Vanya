@@ -1,48 +1,47 @@
-import 'dart:ui';
+﻿import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../theme/oneir_theme.dart';
 
 /// Scales the fixed 351.7x715.3 design canvas to fit the real device/window
 /// size while preserving aspect ratio and staying fully on-screen.
-///
-/// Constraining by width alone (an earlier version of this) works fine on
-/// an actual phone, where width is always the tight dimension -- but breaks
-/// badly on a wide desktop browser window (e.g. `flutter run -d chrome`):
-/// scaling to match a ~1300px-wide window blows the canvas up ~4x, and the
-/// resulting height massively overflows the actual viewport, so only a
-/// tiny, heavily zoomed-in slice of one screen is visible at all. Using the
-/// smaller of the width-based and height-based scale factors (like
-/// BoxFit.contain) fixes that on any aspect ratio, and centering the result
-/// keeps it looking like a phone preview rather than a stretched page.
 class OneirScaffold extends StatelessWidget {
   final Widget child;
   const OneirScaffold({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {
+    // FittedBox, NOT a hand-rolled SizedBox + Transform.scale (that combo
+    // double-scales: outer SizedBox(kDesignWidth * scale) forces tight
+    // constraints down, so the inner SizedBox can't lay out at its
+    // requested 351.7 width and instead lays out at kDesignWidth * scale,
+    // then Transform.scale paints THAT again at scale -- everything ends
+    // up scale^2, clipping text off the right edge and pushing buttons
+    // off the bottom on a real phone).
+    //
+    // FittedBox does it in one step: the child lays out at its natural
+    // 351.7x715.3 size, and a single BoxFit.contain paint scale fits it
+    // on-screen, centered, aspect-ratio preserved, on any screen shape.
+    //
+    // The MediaQuery override pins system font-size scaling to 1.0 inside
+    // the canvas -- this is a fixed-design canvas whose text sizes are
+    // already chosen for legibility at canvas scale; letting a device
+    // "Large font" setting inflate text here is how text bursts out of
+    // buttons and rows that can't grow with it.
+    final mq = MediaQuery.of(context);
     return Scaffold(
       backgroundColor: OneirColors.background,
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          final widthScale = constraints.maxWidth / kDesignWidth;
-          final heightScale = constraints.maxHeight / kDesignHeight;
-          final scale = widthScale < heightScale ? widthScale : heightScale;
-          return Center(
+      body: Center(
+        child: FittedBox(
+          fit: BoxFit.contain,
+          child: MediaQuery(
+            data: mq.copyWith(textScaler: TextScaler.noScaling),
             child: SizedBox(
-              width: kDesignWidth * scale,
-              height: kDesignHeight * scale,
-              child: Transform.scale(
-                scale: scale,
-                alignment: Alignment.topLeft,
-                child: SizedBox(
-                  width: kDesignWidth,
-                  height: kDesignHeight,
-                  child: child,
-                ),
-              ),
+              width: kDesignWidth,
+              height: kDesignHeight,
+              child: child,
             ),
-          );
-        },
+          ),
+        ),
       ),
     );
   }
