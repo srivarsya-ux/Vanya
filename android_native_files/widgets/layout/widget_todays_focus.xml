@@ -18,6 +18,26 @@
         android:textColor="#9A9A9A"
         android:layout_marginBottom="8dp" />
 
+    <!-- Vanya's occasional contextual line -- a morning greeting, "that's
+         one down" after a task finishes, or nothing at all most refreshes
+         (see OneirWidgetMessages.pick(), lib/widgets_android/). GONE by
+         default: TodaysFocusWidgetProvider only sets this VISIBLE when
+         there's an actual message to show, per the brief's "sometimes:
+         nothing. That restraint matters." The one periwinkle-ish color
+         note anywhere in this widget -- matches the app's single-accent
+         rule (see lib/theme/oneir_theme.dart's OneirColors.accent). -->
+    <TextView
+        android:id="@+id/todays_focus_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:textStyle="italic"
+        android:textColor="#A8A4D8"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone" />
+
     <LinearLayout
         android:id="@+id/task_row_1"
         android:layout_width="match_parent"

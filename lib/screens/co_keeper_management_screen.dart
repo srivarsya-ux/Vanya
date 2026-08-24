@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets/vanya_animation.dart';
+import '../widgets/vanya_expression.dart';
 import '../theme/oneir_theme.dart';
 import '../widgets/shared.dart';
 import '../backend/oneir_identity.dart';
@@ -79,7 +79,7 @@ class _CoKeeperManagementScreenState extends State<CoKeeperManagementScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (_pairedId == null) ...[
-                    const VanyaAnimation(width: 180, height: 180),
+                    const VanyaCharacter(expression: VanyaExpression.protecting, width: 180, height: 180),
                     const SizedBox(height: 20),
                     const Text('No Co-Keeper yet', style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, fontSize: 20, color: OneirColors.text)),
                     const SizedBox(height: 8),

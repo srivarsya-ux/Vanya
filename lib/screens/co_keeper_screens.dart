@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets/vanya_animation.dart';
+import '../widgets/vanya_expression.dart';
 import '../theme/oneir_theme.dart';
 import '../widgets/shared.dart';
 import '../backend/co_keeper_backend.dart';
@@ -24,7 +24,7 @@ class CoKeeperIntroScreen extends StatelessWidget {
               Expanded(
                 flex: 3,
                 child: Center(
-                  child: const VanyaAnimation(width: 232, height: 245),
+                  child: const VanyaCharacter(expression: VanyaExpression.protecting, width: 232, height: 245),
                 ),
               ),
               const SizedBox(height: 16),
@@ -232,7 +232,10 @@ class _CoKeeperInviteScreenState extends State<CoKeeperInviteScreen> {
 
   Widget _stepInviteContent() {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      const Center(child: VanyaAnimation(width: 180, height: 129)),
+      // Writing/sending -- the same messaging-intent pose used elsewhere
+      // for a "staying connected" moment, matching what's actually
+      // happening here (composing an invite to send).
+      const Center(child: VanyaCharacter(expression: VanyaExpression.messaging, width: 180, height: 129)),
       const SizedBox(height: 16),
       Text('Invite $_relation', style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w500, fontSize: 22, height: 1.3, color: OneirColors.text)),
       const SizedBox(height: 18),
@@ -248,7 +251,9 @@ class _CoKeeperInviteScreenState extends State<CoKeeperInviteScreen> {
     return Padding(
       padding: const EdgeInsets.only(top: 60),
       child: Column(children: [
-        const VanyaAnimation(width: 206, height: 180),
+        // "The key has found a safe home" -- literally an unlocking/key
+        // moment, so she holds the key rather than just waving.
+        const VanyaCharacter(expression: VanyaExpression.unlocking, width: 206, height: 180),
         const SizedBox(height: 20),
         Text('The key has found a safe home.', style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w500, fontSize: 20, color: OneirColors.text)),
         const SizedBox(height: 10),

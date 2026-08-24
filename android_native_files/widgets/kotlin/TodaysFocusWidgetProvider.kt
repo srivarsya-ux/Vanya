@@ -36,6 +36,19 @@ class TodaysFocusWidgetProvider : AppWidgetProvider() {
         val prefs = context.getSharedPreferences("HomeWidgetPreferences", Context.MODE_PRIVATE)
         val raw = prefs.getString("todays_focus_tasks", null)
 
+        // Vanya's occasional contextual line -- decided in Dart by
+        // OneirWidgetMessages.pick() (lib/widgets_android/oneir_widget_
+        // messages.dart) and pushed here as plain text, empty/absent most
+        // refreshes on purpose. This provider only decides whether to show
+        // the row; it never invents copy of its own.
+        val message = prefs.getString("todays_focus_message", null)
+        if (message.isNullOrBlank()) {
+            views.setViewVisibility(R.id.todays_focus_message, android.view.View.GONE)
+        } else {
+            views.setTextViewText(R.id.todays_focus_message, message)
+            views.setViewVisibility(R.id.todays_focus_message, android.view.View.VISIBLE)
+        }
+
         val rowIds = intArrayOf(R.id.task_row_1, R.id.task_row_2, R.id.task_row_3)
         val labelIds = intArrayOf(R.id.task_label_1, R.id.task_label_2, R.id.task_label_3)
 

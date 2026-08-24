@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
+import 'vanya_expression.dart';
 
-/// The real Vanya animation -- a hand-drawn 2-frame idle/hello loop
-/// (assets/images/hello_vanya.webp), replacing OneirAssetPlaceholder
-/// wherever a Vanya illustration was previously just a labeled gray box.
-///
-/// Only one real animation exists right now, so every call site uses this
-/// same asset regardless of what pose it originally described (holding a
-/// key, drinking tea, etc.) -- honest limitation, not an oversight: once
-/// pose-specific art exists, individual call sites can swap this widget
-/// for a pose-specific one without any layout changes, since the
-/// width/height API matches what OneirAssetPlaceholder already used.
+/// Backward-compatible wrapper around [VanyaCharacter]. Every existing
+/// call site across the app just wants Vanya's default idle/wave pose --
+/// those keep working completely unchanged. A new call site that knows
+/// what Vanya should actually be feeling in that moment (listening,
+/// thinking, proud, protecting, ...) should use [VanyaCharacter] directly
+/// with a real [VanyaExpression] instead of growing this wrapper further.
 class VanyaAnimation extends StatelessWidget {
   final double width;
   final double height;
@@ -18,13 +15,6 @@ class VanyaAnimation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: width,
-      height: height,
-      child: Image.asset(
-        'assets/images/hello_vanya.webp',
-        fit: BoxFit.contain,
-      ),
-    );
+    return VanyaCharacter(expression: VanyaExpression.idle, width: width, height: height);
   }
 }

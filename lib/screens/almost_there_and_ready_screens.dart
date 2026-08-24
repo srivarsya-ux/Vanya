@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets/vanya_animation.dart';
+import '../widgets/vanya_expression.dart';
 import '../theme/oneir_theme.dart';
 import '../widgets/shared.dart';
 
@@ -20,7 +20,9 @@ class AlmostThereScreen extends StatelessWidget {
             children: [
               OneirProgressHeader(progress: 17 / 18, onBack: onBack),
               const Spacer(flex: 2),
-              const VanyaAnimation(width: 235, height: 235),
+              // Steady and supportive -- everything's checked off, one
+              // step to go, not a celebration yet (that's ReadyScreen).
+              const VanyaCharacter(expression: VanyaExpression.encouraging, width: 235, height: 235),
               const SizedBox(height: 24),
               Text('Almost there.',
                   textAlign: TextAlign.center,
@@ -77,7 +79,11 @@ class ReadyScreen extends StatelessWidget {
             children: [
               OneirProgressHeader(progress: 1.0, onBack: onBack),
               const Spacer(flex: 2),
-              const VanyaAnimation(width: 255, height: 280),
+              // A real win worth marking -- onboarding is actually
+              // finished. This was showing the same wave-hello loop as
+              // every other onboarding screen; now the one moment in the
+              // whole flow that's genuinely a celebration looks like one.
+              const VanyaCharacter(expression: VanyaExpression.proud, width: 255, height: 280),
               const SizedBox(height: 28),
               Text("You're all set.",
                   textAlign: TextAlign.center,

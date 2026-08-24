@@ -35,6 +35,19 @@ class QuickFocusWidgetProvider : AppWidgetProvider() {
 
         views.setTextViewText(R.id.quick_focus_value, if (isRunning) "$remaining min left" else "25 min")
 
+        // Vanya's occasional line during a session -- decided in Dart by
+        // OneirWidgetService.updateQuickFocus() (once per session, at the
+        // halfway point, or "Nice work." on a genuine completion). Empty
+        // most refreshes on purpose, same restraint rule as every other
+        // widget message row.
+        val message = prefs.getString("quick_focus_message", null)
+        if (message.isNullOrBlank()) {
+            views.setViewVisibility(R.id.quick_focus_message, android.view.View.GONE)
+        } else {
+            views.setTextViewText(R.id.quick_focus_message, message)
+            views.setViewVisibility(R.id.quick_focus_message, android.view.View.VISIBLE)
+        }
+
         val pendingIntent = HomeWidgetLaunchIntent.getActivity(
             context, MainActivity::class.java, Uri.parse("oneir://widget/focus")
         )

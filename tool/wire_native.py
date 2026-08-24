@@ -401,6 +401,41 @@ def verify_package_dir():
         )
 
 
+WIDGET_TEST = ROOT / "test" / "widget_test.dart"
+
+WIDGET_TEST_CONTENTS = """\
+// Every `flutter create .` run overwrites this file with a default
+// template that references a placeholder `MyApp` widget -- this app's
+// real root widget is `OneirApp` (lib/main.dart), which has never once
+// matched that template, so the default version always failed
+// `flutter analyze` with "MyApp isn't a class" (harmless -- analyze runs
+// with `|| true` in CI -- but still noise on every single build). This
+// script overwrites it right back with something that actually matches
+// the app, the same way it patches every other `flutter create`d file.
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+import 'package:app/main.dart';
+
+void main() {
+  testWidgets('OneirApp builds without throwing', (tester) async {
+    await tester.pumpWidget(const ProviderScope(child: OneirApp()));
+    // Just confirms the widget tree builds; the splash timer means we
+    // don't wait for pumpAndSettle() here (it fires a real Timer).
+    expect(find.byType(OneirApp), findsOneWidget);
+  });
+}
+"""
+
+
+def fix_widget_test():
+    WIDGET_TEST.parent.mkdir(parents=True, exist_ok=True)
+    WIDGET_TEST.write_text(WIDGET_TEST_CONTENTS)
+    step("Replaced the default `flutter create` widget_test.dart template "
+         "(referenced a nonexistent MyApp) with one that matches OneirApp")
+
+
 def main():
     if not ANDROID.exists():
         fail("android/ doesn't exist yet -- run `flutter create . --platforms android "
@@ -412,6 +447,7 @@ def main():
     merge_manifest()
     wire_firebase()
     wire_gemma_min_sdk()
+    fix_widget_test()
     step("Done. android/ is now fully wired -- no manual SETUP.md steps 1-3 remain.")
 
 

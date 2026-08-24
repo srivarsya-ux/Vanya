@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:home_widget/home_widget.dart';
+import 'oneir_widget_messages.dart';
 
 /// The two distinct "open the app and go somewhere specific" actions the
 /// widgets can trigger. Widget 1 (Today's Focus) has no distinct action --
@@ -35,9 +36,36 @@ class OneirWidgetService {
 
   /// Widget 1 -- "Today's Focus": up to 3 tasks with done state. Call
   /// whenever the Home screen's task list changes (add/complete/remove).
+  ///
+  /// Also decides and pushes Vanya's occasional contextual line (see
+  /// OneirWidgetMessages.pick()) -- a morning greeting, "that's one
+  /// down," or nothing at all most of the time. Reads back the previous
+  /// done-count and last-greeted-date it saved on the prior call so it
+  /// can tell "a task was just completed" apart from "this is just a
+  /// routine redraw with nothing new."
   static Future<void> updateTodaysFocus(List<({String label, bool done})> tasks) async {
-    final payload = tasks.take(3).map((t) => {'label': t.label, 'done': t.done}).toList();
+    final capped = tasks.take(3).toList();
+    final payload = capped.map((t) => {'label': t.label, 'done': t.done}).toList();
+    final doneCount = capped.where((t) => t.done).length;
+
+    final previousDoneCount = await HomeWidget.getWidgetData<int>('todays_focus_done_count', defaultValue: 0) ?? 0;
+    final lastGreetedDate = await HomeWidget.getWidgetData<String>('todays_focus_last_greeted_date');
+
+    final now = DateTime.now();
+    final message = OneirWidgetMessages.pick(
+      doneCount: doneCount,
+      totalCount: capped.length,
+      previousDoneCount: previousDoneCount,
+      lastGreetedDate: lastGreetedDate,
+      now: now,
+    );
+
     await HomeWidget.saveWidgetData<String>('todays_focus_tasks', jsonEncode(payload));
+    await HomeWidget.saveWidgetData<String>('todays_focus_message', message ?? '');
+    await HomeWidget.saveWidgetData<int>('todays_focus_done_count', doneCount);
+    if (message == 'Good morning.') {
+      await HomeWidget.saveWidgetData<String>('todays_focus_last_greeted_date', OneirWidgetMessages.todayKey(now));
+    }
     await HomeWidget.updateWidget(name: _todaysFocusProvider, androidName: _todaysFocusProvider);
   }
 
@@ -45,17 +73,50 @@ class OneirWidgetService {
   /// [isRunning]/[remainingMinutes] reflect a session already in
   /// progress (if any) so the widget shows a countdown instead of the
   /// static "25 min" prompt while a session is active.
-  static Future<void> updateQuickFocus({bool isRunning = false, int remainingMinutes = 25}) async {
+  ///
+  /// Also decides Vanya's occasional line under the countdown -- "You're
+  /// doing well" once, at the halfway point of a real running session
+  /// (never repeated within that same session, tracked via
+  /// quick_focus_encouraged), and "Nice work." when [completed] marks a
+  /// session that actually finished rather than one that was merely
+  /// paused or manually reset. Silent the rest of the time, same
+  /// restraint rule as every other widget message.
+  static Future<void> updateQuickFocus({
+    bool isRunning = false,
+    int remainingMinutes = 25,
+    int totalMinutes = 25,
+    bool completed = false,
+  }) async {
+    String? message;
+
+    if (completed) {
+      message = 'Nice work.';
+      await HomeWidget.saveWidgetData<bool>('quick_focus_encouraged', false);
+    } else if (remainingMinutes >= totalMinutes) {
+      // A fresh or reset timer -- clear the per-session flag so the next
+      // real session can earn its own encouragement again.
+      await HomeWidget.saveWidgetData<bool>('quick_focus_encouraged', false);
+    } else if (isRunning) {
+      final alreadyEncouraged = await HomeWidget.getWidgetData<bool>('quick_focus_encouraged', defaultValue: false) ?? false;
+      final halfway = (totalMinutes / 2).ceil();
+      if (!alreadyEncouraged && remainingMinutes <= halfway) {
+        message = "You're doing well.";
+        await HomeWidget.saveWidgetData<bool>('quick_focus_encouraged', true);
+      }
+    }
+
     await HomeWidget.saveWidgetData<bool>('quick_focus_running', isRunning);
     await HomeWidget.saveWidgetData<int>('quick_focus_remaining', remainingMinutes);
+    await HomeWidget.saveWidgetData<String>('quick_focus_message', message ?? '');
     await HomeWidget.updateWidget(name: _quickFocusProvider, androidName: _quickFocusProvider);
   }
 
   /// Widget 3 -- "Vanya Daily Check-in": a standing prompt + an add-task
-  /// shortcut. The prompt itself is static UI copy (not per-user data),
-  /// so there's nothing to push here beyond triggering a redraw after
-  /// install/update -- kept as a method for symmetry with the other two
-  /// and as the natural place to add a real rotating prompt later.
+  /// shortcut. The prompt itself now evolves natively -- see
+  /// VanyaCheckInWidgetProvider.promptFor(), which reads the same
+  /// todays_focus_tasks data [updateTodaysFocus] already pushes for
+  /// Widget 1. This method stays as the plain redraw trigger it always
+  /// was; no new data needed to flow through it for the prompt to change.
   static Future<void> refreshCheckIn() async {
     await HomeWidget.updateWidget(name: _checkInProvider, androidName: _checkInProvider);
   }

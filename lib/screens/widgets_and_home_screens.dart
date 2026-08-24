@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../widgets/vanya_animation.dart';
+import '../widgets/vanya_expression.dart';
 import '../theme/oneir_theme.dart';
 import '../widgets/shared.dart';
 import '../native/oneir_protection.dart';
@@ -147,7 +148,15 @@ class _WidgetsScreenState extends State<WidgetsScreen> {
               scale: _doneCount == kWidgetTasks.length ? 1.06 : 1.0,
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeOutBack,
-              child: const VanyaAnimation(width: 280, height: 280),
+              // Same fix as the real home screen's cheer/tea switcher just
+              // above: the scale bump was already there, but the pose
+              // underneath it never actually changed, so finishing every
+              // preview task looked identical to not finishing them.
+              child: VanyaCharacter(
+                expression: _doneCount == kWidgetTasks.length ? VanyaExpression.proud : VanyaExpression.idle,
+                width: 280,
+                height: 280,
+              ),
             ),
           ),
           const SizedBox(height: 28),
@@ -259,6 +268,13 @@ class _HomeScreenState extends State<HomeScreen> {
   void _syncTodaysFocusWidget() {
     final tasks = [for (var i = 0; i < kWidgetTasks.length; i++) (label: kWidgetTasks[i], done: _checked[i])];
     OneirWidgetService.updateTodaysFocus(tasks);
+    // Widget 3's prompt reads this same task data (see
+    // VanyaCheckInWidgetProvider.promptFor()) but only redraws on its own
+    // OS-scheduled interval unless told to now -- without this, checking
+    // off a task would only make the Check-in widget say "You're doing
+    // well" the next time Android happened to refresh it on its own,
+    // possibly not for a while.
+    OneirWidgetService.refreshCheckIn();
   }
 
   Future<void> _toggle(int i) async {
@@ -361,11 +377,21 @@ class _HomeScreenState extends State<HomeScreen> {
                   ]),
                 ),
                 const SizedBox(width: 10),
+                // Real expression swap now, not just a differently-keyed copy
+                // of the same asset -- this AnimatedSwitcher used to
+                // crossfade between two VanyaAnimation widgets that both
+                // rendered the identical hello/wave loop, so _celebrating
+                // toggling never actually changed what was on screen.
+                // VanyaCharacter gives each branch its own real pose: a
+                // genuine cheer for finishing today's tasks, a calm
+                // settled-in moment (her tea) the rest of the time --
+                // matching the brief's "Vanya sitting there with her little
+                // tea" home-screen centerpiece.
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 300),
                   child: _celebrating
-                      ? const VanyaAnimation(key: ValueKey('cheer'), width: 88, height: 88)
-                      : const VanyaAnimation(key: ValueKey('tea'), width: 88, height: 88),
+                      ? const VanyaCharacter(key: ValueKey('cheer'), expression: VanyaExpression.proud, width: 88, height: 88)
+                      : const VanyaCharacter(key: ValueKey('tea'), expression: VanyaExpression.content, width: 88, height: 88),
                 ),
               ],
             ),

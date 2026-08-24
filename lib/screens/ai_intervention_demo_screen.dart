@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/oneir_theme.dart';
 import '../widgets/shared.dart';
+import '../widgets/vanya_expression.dart';
 import '../native/oneir_protection.dart';
 import '../intervention/widgets/intervention_conversation_screen.dart';
 import '../intervention/models/intervention_decision.dart';
@@ -96,15 +97,22 @@ class _AiInterventionDemoScreenState extends State<AiInterventionDemoScreen> {
                 style: const TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 15, height: 1.5, color: OneirColors.textMuted),
               ),
               const Spacer(),
+              // A real, expression-aware Vanya instead of a generic
+              // graphic_eq icon in a circle -- she's attentive/listening
+              // before the demo runs, then reacts to how it actually went:
+              // pleased if the AI allowed it, steady/encouraging if it
+              // redirected. Neither reaction shames the user either way,
+              // matching the "never a lecture" rule the demo copy itself
+              // already promises below.
               Center(
-                child: Container(
-                  width: 96,
-                  height: 96,
-                  decoration: BoxDecoration(
-                    color: OneirColors.cardNeutral,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.graphic_eq, size: 40, color: OneirColors.accent),
+                child: VanyaCharacter(
+                  expression: !_tried
+                      ? VanyaExpression.listening
+                      : (_lastOutcome == InterventionDecisionType.allow
+                          ? VanyaExpression.happy
+                          : VanyaExpression.encouraging),
+                  width: 140,
+                  height: 140,
                 ),
               ),
               const SizedBox(height: 24),

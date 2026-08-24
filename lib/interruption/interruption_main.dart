@@ -1,5 +1,5 @@
 import 'dart:async';
-import '../widgets/vanya_animation.dart';
+import '../widgets/vanya_expression.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import '../theme/oneir_theme.dart';
@@ -120,8 +120,11 @@ class _CheckInStage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Attentive, not alarmed -- this is the lightest-touch tier (first
+    // attempt today), so she's just checking in, the same way she'd
+    // listen to any other question.
     return Column(mainAxisSize: MainAxisSize.min, children: [
-      const VanyaAnimation(width: 170, height: 203),
+      const VanyaCharacter(expression: VanyaExpression.listening, width: 170, height: 203),
       const SizedBox(height: 16),
       Text('Hey there.', textAlign: TextAlign.center, style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w500, fontSize: 18, color: OneirColors.text)),
       const SizedBox(height: 20),
@@ -142,8 +145,11 @@ class _IntentionStage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasIntention = intention.isNotEmpty;
+    // Weighing/reflecting -- she's holding up what they told themselves
+    // they'd do today against what they're doing right now, not scolding
+    // them for it.
     return Column(mainAxisSize: MainAxisSize.min, children: [
-      const VanyaAnimation(width: 170, height: 203),
+      const VanyaCharacter(expression: VanyaExpression.thinking, width: 170, height: 203),
       const SizedBox(height: 16),
       Text(
         hasIntention ? "Today's intention:\n$intention" : "You haven't set a task for today.",
@@ -218,12 +224,39 @@ class _FullGateStageState extends State<_FullGateStage> {
   @override
   Widget build(BuildContext context) {
     return Column(mainAxisSize: MainAxisSize.min, children: [
-      const VanyaAnimation(width: 170, height: 203),
+      VanyaCharacter(expression: _expression(), width: 170, height: 203),
       const SizedBox(height: 16),
       Text(_headline(), textAlign: TextAlign.center, style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w500, fontSize: 18, color: OneirColors.text)),
       const SizedBox(height: 20),
       ..._buttons(),
     ]);
+  }
+
+  /// This is the tier where "restraint in HOW OFTEN she reacts, not in how
+  /// many expressions exist" matters most -- the full Co-Keeper gate has
+  /// seven distinct real states, and until now every single one of them
+  /// showed the identical idle pose. Each one gets the expression that
+  /// actually matches what's happening: the shield for "protected and
+  /// holding the key," the key pose for an actual unlock, a softer
+  /// encouraging look for a decline rather than anything that could read
+  /// as Vanya being disappointed in them.
+  VanyaExpression _expression() {
+    switch (_state) {
+      case _RequestState.notSent:
+      case _RequestState.checkingPairing:
+        return VanyaExpression.protecting;
+      case _RequestState.pickingReason:
+        return VanyaExpression.listening;
+      case _RequestState.noPairing:
+        return VanyaExpression.concerned;
+      case _RequestState.sending:
+      case _RequestState.waiting:
+        return VanyaExpression.thinking;
+      case _RequestState.approved:
+        return VanyaExpression.unlocking;
+      case _RequestState.declined:
+        return VanyaExpression.encouraging;
+    }
   }
 
   String _headline() {

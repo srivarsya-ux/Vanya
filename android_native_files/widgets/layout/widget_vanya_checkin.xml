@@ -15,7 +15,11 @@
         android:textColor="#2F2E2E"
         android:layout_marginBottom="6dp" />
 
+    <!-- android:text here is only the design-time placeholder --
+         VanyaCheckInWidgetProvider always overwrites this at runtime with
+         a real time-of-day/task-state-aware line (see its promptFor()). -->
     <TextView
+        android:id="@+id/check_in_prompt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="What's one thing you want to get done today?"

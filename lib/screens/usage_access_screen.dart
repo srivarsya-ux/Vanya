@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets/vanya_animation.dart';
+import '../widgets/vanya_expression.dart';
 import '../theme/oneir_theme.dart';
 import '../widgets/shared.dart';
 import '../native/oneir_permissions.dart';
@@ -68,7 +68,7 @@ class _UsageAccessScreenState extends State<UsageAccessScreen> with WidgetsBindi
             children: [
               OneirProgressHeader(progress: 10 / 18, onBack: widget.onBack),
               const Spacer(flex: 2),
-              const VanyaAnimation(width: 168, height: 142),
+              const VanyaCharacter(expression: VanyaExpression.protecting, width: 168, height: 142),
               const SizedBox(height: 24),
               Text('Let me understand when protected apps are being opened.',
                   textAlign: TextAlign.center,

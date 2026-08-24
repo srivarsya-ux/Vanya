@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets/vanya_animation.dart';
+import '../widgets/vanya_expression.dart';
 import '../theme/oneir_theme.dart';
 import '../widgets/shared.dart';
 import '../native/oneir_protection.dart';
@@ -57,8 +57,11 @@ class _WhyHereScreenState extends State<WhyHereScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 12),
+                      // She's genuinely asking and waiting on the answer
+                      // that follows -- the same listening pose used
+                      // anywhere else Vanya poses a real question.
                       Center(
-                        child: VanyaAnimation(width: 168, height: 142),
+                        child: VanyaCharacter(expression: VanyaExpression.listening, width: 168, height: 142),
                       ),
                       const SizedBox(height: 16),
                       Text('What brought you here?',

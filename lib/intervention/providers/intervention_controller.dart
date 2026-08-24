@@ -5,7 +5,16 @@ import '../ai/ai_provider_factory.dart';
 import '../models/intervention_decision.dart';
 import '../services/unlock_scheduler.dart';
 import '../voice/voice_queue_controller.dart';
+import '../../stats/oneir_event_log.dart';
 import 'intervention_state.dart';
+
+/// The onboarding demo (AiInterventionDemoScreen) reuses this exact same
+/// controller/pipeline against a fake package name so a new user can talk
+/// to the real Vanya before finishing setup -- see that screen's doc
+/// comment. Its decisions are real AI output but not a real protected-app
+/// event, so they're excluded here rather than quietly inflating a new
+/// user's very first Statistics numbers with a demo conversation.
+const _demoPackageName = 'com.oneir.onboarding_demo';
 
 /// The one Riverpod provider the UI talks to. Owns the whole conversation:
 /// intent detection -> (optional) clarification loop (max 2 turns) ->
@@ -90,6 +99,7 @@ class InterventionController extends Notifier<InterventionState?> {
 
     state = state!.copyWith(stage: InterventionStage.decided, history: withReply, lastDecision: decision);
     ref.read(voiceQueueControllerProvider.notifier).speakWithLipSync(decision.reply);
+    _logDecision(s, decision);
 
     if (decision.decision == InterventionDecisionType.allow) {
       final minutes = decision.estimatedMinutes ?? 5;
@@ -99,6 +109,35 @@ class InterventionController extends Notifier<InterventionState?> {
         reason: decision.reason,
       );
       state = state!.copyWith(stage: InterventionStage.sessionActive);
+    }
+  }
+
+  /// Statistics' only real data source (see OneirEventLog) -- logs an
+  /// `allow` or `redirect` outcome the moment it's actually decided.
+  /// `clarify` isn't logged (it isn't a finished outcome yet), and the
+  /// onboarding demo's fake package is excluded (see _demoPackageName).
+  void _logDecision(InterventionState s, InterventionDecision decision) {
+    if (s.packageName == _demoPackageName) return;
+    switch (decision.decision) {
+      case InterventionDecisionType.redirect:
+        OneirEventLog.log(OneirEvent(
+          type: OneirEventType.interventionRedirect,
+          timestamp: DateTime.now(),
+          appLabel: s.appLabel,
+          packageName: s.packageName,
+        ));
+        break;
+      case InterventionDecisionType.allow:
+        OneirEventLog.log(OneirEvent(
+          type: OneirEventType.interventionAllow,
+          timestamp: DateTime.now(),
+          appLabel: s.appLabel,
+          packageName: s.packageName,
+          minutes: decision.estimatedMinutes,
+        ));
+        break;
+      case InterventionDecisionType.clarify:
+        break;
     }
   }
 
@@ -132,6 +171,7 @@ class InterventionController extends Notifier<InterventionState?> {
     } else {
       state = state!.copyWith(stage: InterventionStage.decided, history: withReply, lastDecision: decision);
     }
+    _logDecision(s, decision);
   }
 
   Future<void> close() async {

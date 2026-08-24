@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets/vanya_animation.dart';
+import '../widgets/vanya_expression.dart';
 import '../theme/oneir_theme.dart';
 import '../widgets/shared.dart';
 
@@ -48,7 +48,7 @@ class EnableProtectionScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Center(
-                        child: VanyaAnimation(width: 180, height: 168),
+                        child: VanyaCharacter(expression: VanyaExpression.protecting, width: 180, height: 168),
                       ),
                       const SizedBox(height: 16),
                       const Text('A few permissions',

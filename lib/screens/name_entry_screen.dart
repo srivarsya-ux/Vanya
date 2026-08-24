@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets/vanya_animation.dart';
+import '../widgets/vanya_expression.dart';
 import '../theme/oneir_theme.dart';
 import '../widgets/shared.dart';
 import '../native/oneir_protection.dart';
@@ -46,10 +46,12 @@ class _NameEntryScreenState extends State<NameEntryScreen> {
             children: [
               OneirProgressHeader(progress: 4 / 18, onBack: widget.onBack),
               const SizedBox(height: 16),
+              // She's waiting on an answer -- the same attentive pose used
+              // anywhere else Vanya is genuinely listening for a reply.
               const Expanded(
                 flex: 4,
                 child: Center(
-                  child: VanyaAnimation(width: 235, height: 287),
+                  child: VanyaCharacter(expression: VanyaExpression.listening, width: 235, height: 287),
                 ),
               ),
               const SizedBox(height: 16),

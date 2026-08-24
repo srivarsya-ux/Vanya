@@ -9,7 +9,7 @@
 /// real API key inside a compiled APK means anyone can extract and abuse
 /// it. See android_native_files/SETUP.md for how to wire this up for real.
 class AiProviderConfig {
-  final String provider; // "cloud" | "gemini" | "openai" | "anthropic" | "offline"
+  final String provider; // "gemma" | "cloud" | "gemini" | "openai" | "anthropic" | "offline"
   final String? apiKey;
   final String model;
 
@@ -23,35 +23,42 @@ class AiProviderConfig {
   ///   flutter run --dart-define=AI_PROVIDER=cloud
   /// or, for local testing against a provider directly:
   ///   flutter run --dart-define=AI_PROVIDER=anthropic --dart-define=AI_API_KEY=sk-...
-  /// Falls back to the offline provider (no key needed) if nothing is
-  /// configured, so the app always runs rather than crashing on a missing
-  /// key.
   ///
-  /// "cloud" is the one provider that needs no key here at all -- it
-  /// calls the decideIntervention Cloud Function, which holds the real
-  /// API key server-side. That's the setting anything shipped should use;
-  /// the direct provider names (anthropic/openai/gemini) exist mainly for
-  /// local testing without deploying a function first.
+  /// Defaults to "gemma" (on-device Gemma 4 E2B, see
+  /// GemmaInterventionProvider) when nothing is configured at all -- this
+  /// is the decided production setting: no API key, no per-request cost,
+  /// nothing about what a user says to Vanya leaves the device, matching
+  /// the brief's "AI should be almost invisible." "offline" (the simple
+  /// keyword-heuristic fallback) still exists as a safety net for a
+  /// device Gemma genuinely can't run on, but is no longer the default.
+  ///
+  /// "cloud" and "gemma" are the two providers that need no key here at
+  /// all -- "cloud" calls the decideIntervention Cloud Function, which
+  /// holds the real API key server-side, for a deployment that
+  /// deliberately wants server-side inference instead. The other direct
+  /// provider names (anthropic/openai/gemini) exist mainly for local
+  /// testing without deploying a function first.
   factory AiProviderConfig.fromEnvironment() {
-    const provider = String.fromEnvironment('AI_PROVIDER', defaultValue: 'offline');
+    const provider = String.fromEnvironment('AI_PROVIDER', defaultValue: 'gemma');
     const apiKey = String.fromEnvironment('AI_API_KEY', defaultValue: '');
     const model = String.fromEnvironment('AI_MODEL', defaultValue: '');
 
-    if (provider == 'cloud') {
-      return const AiProviderConfig(provider: 'cloud', model: '');
+    if (provider == 'cloud' || provider == 'gemma' || provider == 'offline') {
+      return AiProviderConfig(provider: provider, model: '');
     }
 
     final resolvedModel = model.isNotEmpty ? model : _defaultModelFor(provider);
 
-    if (apiKey.isEmpty && provider != 'offline') {
-      // No key configured for a direct provider -- fall back to offline
-      // rather than making a request that will just fail.
-      return const AiProviderConfig(provider: 'offline', model: '');
+    if (apiKey.isEmpty) {
+      // No key configured for a direct cloud provider -- fall back to the
+      // on-device default rather than making a request that will just
+      // fail with an empty key.
+      return const AiProviderConfig(provider: 'gemma', model: '');
     }
 
     return AiProviderConfig(
       provider: provider,
-      apiKey: apiKey.isEmpty ? null : apiKey,
+      apiKey: apiKey,
       model: resolvedModel,
     );
   }

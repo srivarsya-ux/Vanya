@@ -1,32 +1,55 @@
-﻿import 'dart:ui';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../theme/oneir_theme.dart';
 
 /// Scales the fixed 351.7x715.3 design canvas to fit the real device/window
 /// size while preserving aspect ratio and staying fully on-screen.
+///
+/// Constraining by width alone (an earlier version of this) works fine on
+/// an actual phone, where width is always the tight dimension -- but breaks
+/// badly on a wide desktop browser window (e.g. `flutter run -d chrome`):
+/// scaling to match a ~1300px-wide window blows the canvas up ~4x, and the
+/// resulting height massively overflows the actual viewport, so only a
+/// tiny, heavily zoomed-in slice of one screen is visible at all. Using the
+/// smaller of the width-based and height-based scale factors (like
+/// BoxFit.contain) fixes that on any aspect ratio, and centering the result
+/// keeps it looking like a phone preview rather than a stretched page.
 class OneirScaffold extends StatelessWidget {
   final Widget child;
   const OneirScaffold({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {
-    // FittedBox, NOT a hand-rolled SizedBox + Transform.scale (that combo
-    // double-scales: outer SizedBox(kDesignWidth * scale) forces tight
-    // constraints down, so the inner SizedBox can't lay out at its
-    // requested 351.7 width and instead lays out at kDesignWidth * scale,
-    // then Transform.scale paints THAT again at scale -- everything ends
-    // up scale^2, clipping text off the right edge and pushing buttons
-    // off the bottom on a real phone).
+    // FittedBox, NOT the previous hand-rolled SizedBox + Transform.scale.
     //
-    // FittedBox does it in one step: the child lays out at its natural
-    // 351.7x715.3 size, and a single BoxFit.contain paint scale fits it
-    // on-screen, centered, aspect-ratio preserved, on any screen shape.
+    // The old version had a double-scaling bug that broke EVERY screen at
+    // once, which is why per-screen layout fixes never visibly changed
+    // anything on a real device: the outer SizedBox(kDesignWidth * scale)
+    // passes TIGHT constraints down, Transform forwards them unchanged,
+    // and Flutter's constraint rules force the inner
+    // SizedBox(width: kDesignWidth) to ignore its requested 351.7 width
+    // and lay out at kDesignWidth * scale instead (a child cannot
+    // override tight incoming constraints). Transform.scale then scaled
+    // that already-scaled-up layout AGAIN at paint time, anchored
+    // top-left -- so everything painted at scale^2: a few percent too
+    // big on a typical phone, spilling off the right and bottom edges
+    // (text clipped mid-word at the right edge, bottom buttons pushed
+    // off-screen), while looking pixel-perfect at scale == 1.0 in a
+    // desktop preview sized exactly to the design canvas.
     //
-    // The MediaQuery override pins system font-size scaling to 1.0 inside
-    // the canvas -- this is a fixed-design canvas whose text sizes are
-    // already chosen for legibility at canvas scale; letting a device
-    // "Large font" setting inflate text here is how text bursts out of
-    // buttons and rows that can't grow with it.
+    // FittedBox does the intended thing in one step: the child lays out
+    // at its natural size (the SizedBox below CAN be 351.7x715.3 here,
+    // because FittedBox passes unconstrained layout to it), and the
+    // single BoxFit.contain paint scale fits it on-screen, centered,
+    // with the aspect ratio preserved -- on any screen or window shape.
+    //
+    // The MediaQuery override pins the system font-size setting to 1.0
+    // inside the canvas: this is a fixed-design canvas whose text sizes
+    // are already chosen for legibility at canvas scale, and letting a
+    // device-level "Large font" setting inflate text inside a
+    // fixed-pixel design is exactly how text bursts out of buttons and
+    // rows that can't grow with it. (The canvas itself scales with the
+    // screen, so text still gets physically larger on larger displays.)
     final mq = MediaQuery.of(context);
     return Scaffold(
       backgroundColor: OneirColors.background,
