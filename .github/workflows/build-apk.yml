@@ -69,16 +69,16 @@ jobs:
         run: flutter analyze || true
 
       - name: Build debug APK
-        # --dart-define=AI_PROVIDER=cloud makes Vanya's replies call the
-        # deployed decideIntervention Cloud Function instead of falling
-        # back to OfflineHeuristicProvider. This only actually does
-        # anything once you've deployed the function (firebase deploy
-        # --only functions:decideIntervention) and committed a real
-        # android_native_files/google-services.json -- until then the app
-        # still builds and runs fine, the callable call just fails per-call
-        # and CloudFunctionInterventionProvider falls back to its own
-        # honest "having trouble thinking" clarify reply. See SETUP.md 4b.
-        run: flutter build apk --debug --dart-define=AI_PROVIDER=cloud
+        # --dart-define=AI_PROVIDER=gemma: the decided production default
+        # (see ai_provider_config.dart) -- Vanya's replies come from the
+        # on-device Gemma 4 E2B model (GemmaInterventionProvider), no
+        # Firebase project or API key needed. This used to say
+        # AI_PROVIDER=cloud, which overrode that default and routed every
+        # decision through the (unconfigured) decideIntervention Cloud
+        # Function instead, silently falling back to a "having trouble
+        # thinking" clarify reply every time. See SETUP.md 4b for the
+        # separate opt-in path if cloud is ever wanted again.
+        run: flutter build apk --debug --dart-define=AI_PROVIDER=gemma
 
       - name: Upload APK
         uses: actions/upload-artifact@v4

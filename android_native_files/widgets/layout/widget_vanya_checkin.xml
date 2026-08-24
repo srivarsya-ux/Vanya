@@ -15,7 +15,7 @@
         android:textColor="#2F2E2E"
         android:layout_marginBottom="6dp" />
 
-    <!-- android:text here is only the design-time placeholder --
+    <!-- android:text here is only the design-time placeholder.
          VanyaCheckInWidgetProvider always overwrites this at runtime with
          a real time-of-day/task-state-aware line (see its promptFor()). -->
     <TextView

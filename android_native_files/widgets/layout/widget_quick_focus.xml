@@ -29,7 +29,7 @@
         android:textColor="#2F2E2E" />
 
     <!-- Vanya's one-time-per-session encouragement (see
-         OneirWidgetService.updateQuickFocus's halfway-point logic) --
+         OneirWidgetService.updateQuickFocus's halfway-point logic).
          GONE by default, shown only for the one refresh where there's an
          actual message, same restraint rule as Today's Focus's message
          row. -->
