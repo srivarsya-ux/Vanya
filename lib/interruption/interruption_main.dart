@@ -1,12 +1,15 @@
 import 'dart:async';
 import '../widgets/vanya_expression.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import '../theme/oneir_theme.dart';
 import '../widgets/shared.dart';
 import '../native/oneir_protection.dart';
+import '../native/oneir_apps.dart';
 import '../backend/co_keeper_backend.dart';
 import '../backend/oneir_identity.dart';
+import '../intervention/widgets/intervention_conversation_screen.dart';
 
 /// Separate entrypoint launched by InterruptionActivity (native Android)
 /// when OneirAccessibilityService detects a protected app opening. Kept
@@ -15,8 +18,19 @@ import '../backend/oneir_identity.dart';
 ///
 /// Implements the graduated, adaptive-by-temptation-level flow from the
 /// Co-Keeper philosophy doc: a low-attempt-count open just gets a gentle
-/// check-in; repeated attempts escalate to an intention check, then to the
-/// full Co-Keeper gate.
+/// check-in (cheap, no AI call -- this is the one part of the flow that was
+/// already real). Repeated attempts now escalate into the REAL AI
+/// conversation (InterventionConversationScreen -- the same voice+lip-sync
+/// pipeline the onboarding demo already used), which is what "the actual
+/// intervention" means in practice; it wasn't previously reachable from a
+/// real on-device app-open at all, only from onboarding. The full
+/// Co-Keeper key-request gate stays for the highest tier, and is also
+/// reachable mid-conversation via that screen's own "Ask Co-Keeper" quick
+/// action.
+///
+/// Needs a ProviderScope here (this entrypoint boots its own separate
+/// widget tree from `main()`'s) since InterventionConversationScreen reads
+/// Riverpod providers (interventionControllerProvider, voice, speech).
 @pragma('vm:entry-point')
 void interruptionMain(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,7 +40,7 @@ void interruptionMain(List<String> args) async {
     debugPrint('Firebase not configured yet -- Co-Keeper requests will show as unavailable: $e');
   }
   final openedPackage = args.isNotEmpty ? args.first : '';
-  runApp(InterruptionApp(openedPackage: openedPackage));
+  runApp(ProviderScope(child: InterruptionApp(openedPackage: openedPackage)));
 }
 
 class InterruptionApp extends StatelessWidget {
@@ -59,6 +73,7 @@ class InterruptionScreen extends StatefulWidget {
 class _InterruptionScreenState extends State<InterruptionScreen> {
   _Tier? _tier;
   String _intention = '';
+  String _appLabel = '';
   bool _loading = true;
 
   @override
@@ -70,6 +85,13 @@ class _InterruptionScreenState extends State<InterruptionScreen> {
   Future<void> _setUp() async {
     final attemptCount = await OneirProtection.recordAndGetAttemptCount(widget.openedPackage);
     final intention = await OneirProtection.loadCurrentIntention();
+    // The real conversation screen wants a human-readable app name ("Instagram"),
+    // not the raw package string -- look it up from the same installed-apps
+    // query the Protected Apps picker already uses. Fails soft to the package
+    // name itself (still readable, just less polished) rather than blocking
+    // the whole intervention on this one lookup.
+    final installed = await OneirApps.getInstalledApps();
+    final match = installed.where((a) => a.packageName == widget.openedPackage);
     if (!mounted) return;
     setState(() {
       _tier = attemptCount <= 1
@@ -78,6 +100,7 @@ class _InterruptionScreenState extends State<InterruptionScreen> {
               ? _Tier.intentionCheck
               : _Tier.fullGate;
       _intention = intention;
+      _appLabel = match.isNotEmpty ? match.first.label : widget.openedPackage;
       _loading = false;
     });
   }
@@ -91,6 +114,21 @@ class _InterruptionScreenState extends State<InterruptionScreen> {
     if (_loading) {
       return const Scaffold(backgroundColor: Colors.black26, body: Center(child: CircularProgressIndicator()));
     }
+
+    // Tier 2 (intentionCheck) is the real, AI-backed conversation (voice +
+    // lip-sync, genuine intent understanding) -- it owns its own
+    // Scaffold/background, so it's returned directly rather than nested in
+    // the plain white card
+    // below (which is only for the cheap, no-AI first-touch check-in).
+    if (_tier == _Tier.intentionCheck) {
+      return InterventionConversationScreen(
+        appLabel: _appLabel,
+        packageName: widget.openedPackage,
+        onDismiss: _stayHere,
+        onLaunchApp: _goAnyway,
+      );
+    }
+
     return Scaffold(
       backgroundColor: Colors.black.withOpacity(0.55),
       body: Center(
@@ -102,7 +140,7 @@ class _InterruptionScreenState extends State<InterruptionScreen> {
           child: SingleChildScrollView(
             child: switch (_tier!) {
               _Tier.checkIn => _CheckInStage(onGoAnyway: _goAnyway, onStayHere: _stayHere),
-              _Tier.intentionCheck => _IntentionStage(intention: _intention, onGoAnyway: _goAnyway, onStayHere: _stayHere),
+              _Tier.intentionCheck => _IntentionStage(intention: _intention, onGoAnyway: _goAnyway, onStayHere: _stayHere), // unreachable now, see build() above -- kept rather than deleted, same convention as other superseded screens in this project
               _Tier.fullGate => _FullGateStage(openedPackage: widget.openedPackage, onReturnHome: _stayHere),
             },
           ),

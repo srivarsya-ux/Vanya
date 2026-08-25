@@ -67,16 +67,24 @@ different.
    platform.
 3. In the Firebase Console, enable **Firestore** (start in production mode)
    and **Cloud Messaging**.
-4. Deploy the security rules and the Cloud Function:
+4. Deploy the security rules, the composite index, and the Cloud Function:
    ```
    npm install -g firebase-tools
    firebase login
-   firebase init firestore functions   # point it at the existing firestore.rules and functions/ folder in this project
-   firebase deploy --only firestore:rules,functions
+   firebase use --add   # point this checkout at your Firebase project (this repo already ships firebase.json + firestore.indexes.json)
+   firebase deploy --only firestore:rules,firestore:indexes,functions
    ```
    The Cloud Function requires the Blaze (pay-as-you-go) plan -- the free
    Spark plan doesn't support Cloud Functions. Firestore itself has a free
    tier that's plenty for testing.
+
+   The `firestore:indexes` deploy matters, not just the rules: `requests`
+   is queried by `coKeeperId` + `status` + ordered by `createdAt`
+   (`CoKeeperBackend.watchPendingRequestsForMe`, used by both the Co-Keeper
+   inbox and management screens) -- a query across 3 fields like that
+   needs a composite index Firestore won't create for you automatically.
+   Skipping this step means those two screens throw `FAILED_PRECONDITION`
+   the first time they run, even with Firebase otherwise fully configured.
 5. `lib/main.dart` already calls `Firebase.initializeApp()` and registers
    the device for push on startup -- once `firebase_options.dart` exists,
    it'll just work.

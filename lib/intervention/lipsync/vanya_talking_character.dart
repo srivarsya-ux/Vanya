@@ -123,6 +123,7 @@ class _VanyaTalkingCharacterState extends State<VanyaTalkingCharacter> {
     try {
       await _player.stop();
       await _player.setSourceDeviceFile(audioPath);
+      await _player.setVolume(1.0);
 
       _positionSub = _player.onPositionChanged.listen((position) {
         final seconds = position.inMicroseconds / 1000000.0;
