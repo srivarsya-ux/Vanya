@@ -67,10 +67,10 @@ class _WidgetsScreenState extends State<WidgetsScreen> {
 
     return OneirScaffold(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(26, 20, 26, 24),
+        padding: const EdgeInsets.fromLTRB(OneirSpace.xxl + 2, OneirSpace.xl, OneirSpace.xxl + 2, OneirSpace.xxl),
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           OneirProgressHeader(progress: 15 / 18, onBack: widget.onBack),
-          const SizedBox(height: 20),
+          const SizedBox(height: OneirSpace.xl),
           Expanded(
             child: SingleChildScrollView(
               child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
@@ -78,20 +78,16 @@ class _WidgetsScreenState extends State<WidgetsScreen> {
           // -reserved padding: Flutter's layout engine allocates the space
           // itself here, so this cannot overflow regardless of task label
           // length or card width, unlike guessing a pixel margin by hand.
-          Container(
-            decoration: BoxDecoration(
-              color: OneirColors.cardNeutral,
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: const [BoxShadow(color: Color(0x0F000000), blurRadius: 10, offset: Offset(0, 2))],
-            ),
-            padding: const EdgeInsets.fromLTRB(20, 20, 16, 20),
+          OneirCard(
+            radius: OneirRadius.xl,
+            padding: const EdgeInsets.fromLTRB(OneirSpace.xl, OneirSpace.xl, OneirSpace.lg, OneirSpace.xl),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Expanded(
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-                    Text("Today's Adventure", style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, fontSize: 16, color: OneirColors.text)),
-                    const SizedBox(height: 14),
+                    Text("Today's Adventure", style: OneirText.title),
+                    const SizedBox(height: OneirSpace.md + 2),
                     for (var i = 0; i < kWidgetTasks.length; i++)
                       GestureDetector(
                         onTap: () {
@@ -99,26 +95,24 @@ class _WidgetsScreenState extends State<WidgetsScreen> {
                           _persist();
                         },
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          padding: const EdgeInsets.symmetric(vertical: OneirSpace.sm),
                           child: Row(children: [
                             AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
                               width: 20, height: 20,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(6),
-                                color: _checked[i] ? OneirColors.text : Colors.transparent,
+                                color: _checked[i] ? OneirColors.accent : Colors.transparent,
                                 border: _checked[i] ? null : Border.all(color: OneirColors.border, width: 1.5),
                               ),
                               child: _checked[i] ? const Icon(Icons.check, size: 12, color: Colors.white) : null,
                             ),
-                            const SizedBox(width: 10),
+                            const SizedBox(width: OneirSpace.sm + 2),
                             Expanded(
                               child: Text(
                                 kWidgetTasks[i],
                                 overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontFamily: 'PlusJakartaSans', fontSize: 14,
-                                  color: _checked[i] ? const Color(0xFFB0B0B0) : OneirColors.text,
+                                style: (_checked[i] ? OneirText.bodyStrong.copyWith(color: OneirColors.textFaint) : OneirText.bodyStrong).copyWith(
                                   decoration: _checked[i] ? TextDecoration.lineThrough : TextDecoration.none,
                                 ),
                               ),
@@ -126,23 +120,23 @@ class _WidgetsScreenState extends State<WidgetsScreen> {
                           ]),
                         ),
                       ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: OneirSpace.lg),
                     ClipRRect(
                       borderRadius: BorderRadius.circular(3),
                       child: LinearProgressIndicator(
                         value: progress, minHeight: 6,
-                        backgroundColor: const Color(0xFFE5E5E5),
-                        valueColor: const AlwaysStoppedAnimation(OneirColors.text),
+                        backgroundColor: OneirColors.border,
+                        valueColor: const AlwaysStoppedAnimation(OneirColors.accent),
                       ),
                     ),
                   ]),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: OneirSpace.md),
                 const VanyaAnimation(width: 104, height: 104),
               ],
             ),
           ),
-          const SizedBox(height: 28),
+          const SizedBox(height: OneirSpace.xxxl - 4),
           Center(
             child: AnimatedScale(
               scale: _doneCount == kWidgetTasks.length ? 1.06 : 1.0,
@@ -159,19 +153,19 @@ class _WidgetsScreenState extends State<WidgetsScreen> {
               ),
             ),
           ),
-          const SizedBox(height: 28),
+          const SizedBox(height: OneirSpace.xxxl - 4),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
+            padding: const EdgeInsets.symmetric(horizontal: OneirSpace.sm),
             child: Text(
               'Your widgets remind you what matters before you even think about scrolling.',
               textAlign: TextAlign.center,
-              style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 20.6, height: 1.5, color: OneirColors.textMuted),
+              style: OneirText.heading.copyWith(fontSize: 20.6, fontWeight: FontWeight.w500, color: OneirColors.textMuted, letterSpacing: 0),
             ),
           ),
               ]),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: OneirSpace.lg),
           OneirPrimaryButton(label: 'This feels good', onPressed: _handleContinue),
         ]),
       ),
@@ -187,21 +181,16 @@ class SectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: OneirColors.cardNeutral,
-      borderRadius: BorderRadius.circular(18),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(18),
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-            SizedBox(height: 24, child: Align(alignment: Alignment.bottomLeft, child: Icon(icon, size: 24, color: OneirColors.textMuted))),
-            const SizedBox(height: 8),
-            Text(label, style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 12.5, fontWeight: FontWeight.w500, color: OneirColors.text), maxLines: 2),
-          ]),
-        ),
-      ),
+    return OneirCard(
+      radius: OneirRadius.md,
+      onTap: onTap,
+      padding: const EdgeInsets.symmetric(horizontal: OneirSpace.md + 2, vertical: OneirSpace.md + 2),
+      elevated: false,
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+        SizedBox(height: 24, child: Align(alignment: Alignment.bottomLeft, child: Icon(icon, size: 24, color: OneirColors.accentStrong))),
+        const SizedBox(height: OneirSpace.sm),
+        Text(label, style: OneirText.bodyStrong.copyWith(fontSize: 12.5), maxLines: 2),
+      ]),
     );
   }
 }
@@ -216,6 +205,15 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<bool> _checked = List.filled(kWidgetTasks.length, false);
+  // The real, user-editable task list from the Tasks screen
+  // (OneirProtection.saveTaskList/loadTaskList) -- previously Home never
+  // read this at all, always showing the fixed 3-item kWidgetTasks demo
+  // regardless of what was actually added on Tasks. Once the user has
+  // added any real tasks, those take over this card; the fixed demo stays
+  // as the very-first-run experience before that.
+  List<Map<String, dynamic>> _realTasks = [];
+  bool get _useRealTasks => _realTasks.isNotEmpty;
+
   bool _celebrating = false;
   StreamSubscription<Uri?>? _widgetLaunchSub;
 
@@ -249,24 +247,40 @@ class _HomeScreenState extends State<HomeScreen> {
         Navigator.of(context).push(MaterialPageRoute(builder: (_) => const FocusTimeScreen()));
         break;
       case OneirWidgetLaunch.quickAddTask:
-        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const TasksScreen(autoFocusAdd: true)));
+        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const TasksScreen(autoFocusAdd: true))).then((_) => _refreshRealTasks());
         break;
     }
   }
 
   Future<void> _loadSavedState() async {
     final saved = await OneirProtection.loadTaskState();
-    if (!mounted || saved == null) return;
+    final realTasks = await OneirProtection.loadTaskList();
+    if (!mounted) return;
     setState(() {
-      for (var i = 0; i < _checked.length && i < saved.length; i++) {
-        _checked[i] = saved[i];
+      if (saved != null) {
+        for (var i = 0; i < _checked.length && i < saved.length; i++) {
+          _checked[i] = saved[i];
+        }
       }
+      _realTasks = realTasks;
     });
     _syncTodaysFocusWidget();
   }
 
+  /// Re-reads the real task list -- called after returning from the Tasks
+  /// screen so anything added/checked there shows up here immediately,
+  /// not just on the next cold start.
+  Future<void> _refreshRealTasks() async {
+    final realTasks = await OneirProtection.loadTaskList();
+    if (!mounted) return;
+    setState(() => _realTasks = realTasks);
+    _syncTodaysFocusWidget();
+  }
+
   void _syncTodaysFocusWidget() {
-    final tasks = [for (var i = 0; i < kWidgetTasks.length; i++) (label: kWidgetTasks[i], done: _checked[i])];
+    final tasks = _useRealTasks
+        ? [for (final t in _realTasks) (label: t['label'] as String? ?? '', done: t['done'] as bool? ?? false)]
+        : [for (var i = 0; i < kWidgetTasks.length; i++) (label: kWidgetTasks[i], done: _checked[i])];
     OneirWidgetService.updateTodaysFocus(tasks);
     // Widget 3's prompt reads this same task data (see
     // VanyaCheckInWidgetProvider.promptFor()) but only redraws on its own
@@ -293,12 +307,56 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Widget _taskRow({required String label, required bool done, required VoidCallback onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: OneirSpace.sm - 2),
+        child: Row(children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            width: 16, height: 16,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(5),
+              color: done ? OneirColors.accent : Colors.transparent,
+              border: done ? null : Border.all(color: OneirColors.border, width: 1.5),
+            ),
+            child: done ? const Icon(Icons.check, size: 11, color: Colors.white) : null,
+          ),
+          const SizedBox(width: OneirSpace.sm + 2),
+          Expanded(
+            child: Text(
+              label,
+              overflow: TextOverflow.ellipsis,
+              style: (done ? OneirText.bodyStrong.copyWith(color: OneirColors.textFaint, fontSize: 13) : OneirText.bodyStrong.copyWith(fontSize: 13)).copyWith(
+                decoration: done ? TextDecoration.lineThrough : TextDecoration.none,
+              ),
+            ),
+          ),
+        ]),
+      ),
+    );
+  }
+
+  Future<void> _toggleReal(int i) async {
+    final wasUnchecked = !(_realTasks[i]['done'] as bool? ?? false);
+    setState(() => _realTasks[i]['done'] = !(_realTasks[i]['done'] as bool? ?? false));
+    await OneirProtection.saveTaskList(_realTasks);
+    _syncTodaysFocusWidget();
+    if (wasUnchecked && (_realTasks[i]['done'] as bool)) {
+      setState(() => _celebrating = true);
+      Future.delayed(const Duration(seconds: 2), () {
+        if (mounted) setState(() => _celebrating = false);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return OneirScaffold(
       child: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 26, 24, 24),
+          padding: const EdgeInsets.fromLTRB(OneirSpace.xxl, OneirSpace.xxl + 2, OneirSpace.xxl, OneirSpace.xxl),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -307,76 +365,58 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Good Morning, ${widget.name.isEmpty ? "Alex" : widget.name}',
-                        style: const TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w700, fontSize: 24, letterSpacing: -0.4, color: OneirColors.text)),
+                    Text('Good Morning, ${widget.name.isEmpty ? "Alex" : widget.name}', style: OneirText.heading),
                     const SizedBox(height: 2),
-                    const Text('Tue, 22 Jul', style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 13, color: OneirColors.textFaint)),
+                    Text('Tue, 22 Jul', style: OneirText.caption.copyWith(letterSpacing: 0)),
                   ],
                 ),
               ),
               Material(
-                color: OneirColors.cardNeutral,
-                borderRadius: BorderRadius.circular(14),
+                color: OneirColors.surfaceSunken,
+                borderRadius: BorderRadius.circular(OneirRadius.sm),
                 child: InkWell(
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(OneirRadius.sm),
                   onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const SettingsScreen())),
                   child: const Padding(
-                    padding: EdgeInsets.all(10),
+                    padding: EdgeInsets.all(OneirSpace.md - 2),
                     child: Icon(Icons.settings_outlined, size: 22, color: OneirColors.text),
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 20),
-          Container(
-            decoration: BoxDecoration(
-              color: OneirColors.cardNeutral,
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: const [BoxShadow(color: Color(0x0F000000), blurRadius: 10, offset: Offset(0, 2))],
-            ),
-            padding: const EdgeInsets.fromLTRB(20, 18, 16, 18),
+          const SizedBox(height: OneirSpace.xl),
+          OneirCard(
+            radius: OneirRadius.xl,
+            padding: const EdgeInsets.fromLTRB(OneirSpace.xl, OneirSpace.lg + 2, OneirSpace.lg, OneirSpace.lg + 2),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Expanded(
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-                    Text("Today's Adventure", style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, fontSize: 15, color: OneirColors.text)),
-                    const SizedBox(height: 10),
-                    for (var i = 0; i < kWidgetTasks.length; i++)
-                      GestureDetector(
+                    Text("Today's Adventure", style: OneirText.title.copyWith(fontSize: 15)),
+                    const SizedBox(height: OneirSpace.sm + 2),
+                    // Once real tasks exist (added via the Tasks screen),
+                    // they replace the fixed 3-item starter demo here --
+                    // previously this card always showed the same
+                    // "Say hi to Vanya / Finish Biology / Read 10 pages"
+                    // placeholder forever, regardless of what was actually
+                    // added elsewhere in the app.
+                    if (_useRealTasks)
+                      for (var i = 0; i < _realTasks.length; i++) _taskRow(
+                        label: _realTasks[i]['label'] as String? ?? '',
+                        done: _realTasks[i]['done'] as bool? ?? false,
+                        onTap: () => _toggleReal(i),
+                      )
+                    else
+                      for (var i = 0; i < kWidgetTasks.length; i++) _taskRow(
+                        label: kWidgetTasks[i],
+                        done: _checked[i],
                         onTap: () => _toggle(i),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 6),
-                          child: Row(children: [
-                            AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              width: 16, height: 16,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5),
-                                color: _checked[i] ? OneirColors.text : Colors.transparent,
-                                border: _checked[i] ? null : Border.all(color: OneirColors.border, width: 1.5),
-                              ),
-                              child: _checked[i] ? const Icon(Icons.check, size: 11, color: Colors.white) : null,
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Text(
-                                kWidgetTasks[i],
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontFamily: 'PlusJakartaSans', fontSize: 13,
-                                  color: _checked[i] ? const Color(0xFFB0B0B0) : OneirColors.text,
-                                  decoration: _checked[i] ? TextDecoration.lineThrough : TextDecoration.none,
-                                ),
-                              ),
-                            ),
-                          ]),
-                        ),
                       ),
                   ]),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: OneirSpace.sm + 2),
                 // Real expression swap now, not just a differently-keyed copy
                 // of the same asset -- this AnimatedSwitcher used to
                 // crossfade between two VanyaAnimation widgets that both
@@ -387,27 +427,50 @@ class _HomeScreenState extends State<HomeScreen> {
                 // settled-in moment (her tea) the rest of the time --
                 // matching the brief's "Vanya sitting there with her little
                 // tea" home-screen centerpiece.
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  child: _celebrating
-                      ? const VanyaCharacter(key: ValueKey('cheer'), expression: VanyaExpression.proud, width: 88, height: 88)
-                      : const VanyaCharacter(key: ValueKey('tea'), expression: VanyaExpression.content, width: 88, height: 88),
+                //
+                // Bumped from 88x88 (she read as small/washed-out next to
+                // this much white card) up to 128x128, with a soft
+                // lavender glow behind her -- there's no dimming filter
+                // anywhere on VanyaCharacter itself to remove, so size plus
+                // a bit of background warmth is what actually moves the
+                // needle here.
+                Container(
+                  width: 128,
+                  height: 128,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [OneirColors.accent.withOpacity(0.24), OneirColors.accent.withOpacity(0)],
+                    ),
+                  ),
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: _celebrating
+                        ? const VanyaCharacter(key: ValueKey('cheer'), expression: VanyaExpression.proud, width: 128, height: 128)
+                        : const VanyaCharacter(key: ValueKey('tea'), expression: VanyaExpression.content, width: 128, height: 128),
+                  ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 22),
+          const SizedBox(height: OneirSpace.xxl - 2),
           GridView.count(
             crossAxisCount: 2,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 12, crossAxisSpacing: 12,
+            mainAxisSpacing: OneirSpace.md, crossAxisSpacing: OneirSpace.md,
             childAspectRatio: 1.3,
             children: [
               SectionCard(
                 label: 'Tasks',
                 icon: Icons.checklist_rounded,
-                onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const TasksScreen())),
+                // Reload the real task list on return so anything
+                // added/checked on the Tasks screen shows up in "Today's
+                // Adventure" above immediately -- not just next cold start.
+                onTap: () async {
+                  await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const TasksScreen()));
+                  _refreshRealTasks();
+                },
               ),
               SectionCard(
                 label: 'Protected Apps',
@@ -428,9 +491,9 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 22),
-          Text('Your streaks', style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, fontSize: 15, color: OneirColors.text)),
-          const SizedBox(height: 10),
+          const SizedBox(height: OneirSpace.xxl - 2),
+          Text('Your streaks', style: OneirText.title.copyWith(fontSize: 15)),
+          const SizedBox(height: OneirSpace.sm + 2),
           Row(
             children: [
               Expanded(
@@ -441,7 +504,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const FocusTimeScreen())),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: OneirSpace.md),
               Expanded(
                 child: OneirStreakWidgetCard(
                   title: 'Study Streak',
@@ -449,7 +512,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   totalDays: 14,
                   locked: true,
                   onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Complete a few more tasks to unlock Study Streak.', style: TextStyle(fontFamily: 'PlusJakartaSans'))),
+                    SnackBar(content: Text('Complete a few more tasks to unlock Study Streak.', style: OneirText.bodySmall.copyWith(color: Colors.white))),
                   ),
                 ),
               ),

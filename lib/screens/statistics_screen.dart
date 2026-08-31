@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/oneir_theme.dart';
+import '../widgets/shared.dart';
 import '../native/oneir_protection.dart';
 import '../stats/oneir_event_log.dart';
 
@@ -144,58 +145,56 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
         backgroundColor: OneirColors.background,
         elevation: 0,
         leading: IconButton(icon: const Icon(Icons.arrow_back, color: OneirColors.text), onPressed: () => Navigator.of(context).pop()),
-        title: const Text('Statistics', style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, color: OneirColors.text)),
+        title: Text('Statistics', style: OneirText.title.copyWith(fontSize: 18)),
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator(color: OneirColors.accent))
           : ListView(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(OneirSpace.xl),
               children: [
-                Text('This week', style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, fontSize: 13, letterSpacing: 0.02, color: OneirColors.textFaint)),
-                const SizedBox(height: 10),
+                Text('This week', style: OneirText.eyebrow),
+                const SizedBox(height: OneirSpace.sm + 2),
                 Row(children: [
                   Expanded(child: _StatCard(label: 'Interruptions avoided', value: '$_interruptionsAvoided')),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: OneirSpace.md),
                   Expanded(child: _StatCard(label: 'Focus sessions', value: '$_focusSessions')),
                 ]),
-                const SizedBox(height: 12),
+                const SizedBox(height: OneirSpace.md),
                 Row(children: [
                   Expanded(child: _StatCard(label: 'Focus time', value: _focusMinutes > 0 ? '${_focusMinutes ~/ 60}h ${_focusMinutes % 60}m' : '0m')),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: OneirSpace.md),
                   Expanded(child: _StatCard(label: 'Most protected app', value: _mostProtectedApp ?? '—')),
                 ]),
-                const SizedBox(height: 20),
+                const SizedBox(height: OneirSpace.xxl),
                 _WeekBars(dailyRedirects: _dailyRedirects),
-                const SizedBox(height: 16),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(color: OneirColors.cardNeutral, borderRadius: BorderRadius.circular(16)),
+                const SizedBox(height: OneirSpace.lg),
+                OneirCard(
+                  padding: const EdgeInsets.all(OneirSpace.lg),
+                  elevated: false,
                   child: Text(
                     _weekSummaryLine(),
-                    style: const TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 14, fontStyle: FontStyle.italic, color: OneirColors.text),
+                    style: OneirText.bodyStrong.copyWith(fontStyle: FontStyle.italic),
                   ),
                 ),
-                const SizedBox(height: 24),
-                Text('Today', style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, fontSize: 13, letterSpacing: 0.02, color: OneirColors.textFaint)),
-                const SizedBox(height: 10),
+                const SizedBox(height: OneirSpace.xxxl - 8),
+                Text('Today', style: OneirText.eyebrow),
+                const SizedBox(height: OneirSpace.sm + 2),
                 Row(children: [
                   Expanded(child: _StatCard(label: 'Tasks completed', value: '$_tasksCompleted / $_tasksTotal')),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: OneirSpace.md),
                   Expanded(child: _StatCard(label: 'Protected apps', value: '$_protectedAppCount')),
                 ]),
-                const SizedBox(height: 12),
+                const SizedBox(height: OneirSpace.md),
                 if (_reason.isNotEmpty)
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(color: OneirColors.cardNeutral, borderRadius: BorderRadius.circular(16)),
+                  OneirCard(
+                    padding: const EdgeInsets.all(OneirSpace.lg),
+                    elevated: false,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Why you started', style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, fontSize: 13, color: OneirColors.textFaint)),
-                        const SizedBox(height: 6),
-                        Text(_reason, style: const TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 14, color: OneirColors.text)),
+                        Text('Why you started', style: OneirText.eyebrow),
+                        const SizedBox(height: OneirSpace.sm - 2),
+                        Text(_reason, style: OneirText.bodyStrong),
                       ],
                     ),
                   ),
@@ -212,15 +211,15 @@ class _StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: OneirColors.cardNeutral, borderRadius: BorderRadius.circular(16)),
+    return OneirCard(
+      padding: const EdgeInsets.all(OneirSpace.lg),
+      elevated: false,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(value, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w700, fontSize: 22, color: OneirColors.text)),
-          const SizedBox(height: 4),
-          Text(label, style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 12, color: OneirColors.textFaint)),
+          Text(value, maxLines: 1, overflow: TextOverflow.ellipsis, style: OneirText.heading.copyWith(fontSize: 22)),
+          const SizedBox(height: OneirSpace.xs),
+          Text(label, style: OneirText.caption),
         ],
       ),
     );
@@ -242,29 +241,28 @@ class _WeekBars extends StatelessWidget {
     final now = DateTime.now();
     const dayLetters = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
-      decoration: BoxDecoration(color: OneirColors.cardNeutral, borderRadius: BorderRadius.circular(16)),
+    return OneirCard(
+      padding: const EdgeInsets.fromLTRB(OneirSpace.lg, OneirSpace.lg, OneirSpace.lg, OneirSpace.sm + 2),
+      elevated: false,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Your week', style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, fontSize: 13, color: OneirColors.textFaint)),
-          const SizedBox(height: 14),
+          Text('Your week', style: OneirText.eyebrow),
+          const SizedBox(height: OneirSpace.md + 2),
           SizedBox(
             height: 64,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 for (var i = 0; i < 7; i++) ...[
-                  if (i > 0) const SizedBox(width: 8),
+                  if (i > 0) const SizedBox(width: OneirSpace.sm),
                   Expanded(
                     child: FractionallySizedBox(
                       heightFactor: dailyRedirects[i] == 0 ? 0.06 : (dailyRedirects[i] / maxValue).clamp(0.12, 1.0),
                       alignment: Alignment.bottomCenter,
                       child: Container(
                         decoration: BoxDecoration(
-                          color: dailyRedirects[i] == 0 ? OneirColors.border.withOpacity(0.5) : OneirColors.accent,
+                          color: dailyRedirects[i] == 0 ? OneirColors.border : OneirColors.accent,
                           borderRadius: BorderRadius.circular(4),
                         ),
                       ),
@@ -274,16 +272,16 @@ class _WeekBars extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: OneirSpace.sm),
           Row(
             children: [
               for (var i = 0; i < 7; i++) ...[
-                if (i > 0) const SizedBox(width: 8),
+                if (i > 0) const SizedBox(width: OneirSpace.sm),
                 Expanded(
                   child: Text(
                     dayLetters[now.subtract(Duration(days: 6 - i)).weekday % 7],
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 10, color: OneirColors.textFaint),
+                    style: OneirText.caption.copyWith(fontSize: 10, letterSpacing: 0),
                   ),
                 ),
               ],

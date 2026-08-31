@@ -50,40 +50,40 @@ class _WhyHereScreenState extends State<WhyHereScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               OneirProgressHeader(progress: 5 / 18, onBack: widget.onBack),
-              const SizedBox(height: 12),
+              const SizedBox(height: OneirSpace.md),
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SizedBox(height: 12),
+                      const SizedBox(height: OneirSpace.md),
                       // She's genuinely asking and waiting on the answer
                       // that follows -- the same listening pose used
                       // anywhere else Vanya poses a real question.
                       Center(
                         child: VanyaCharacter(expression: VanyaExpression.listening, width: 168, height: 142),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: OneirSpace.lg),
                       Text('What brought you here?',
-                          style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w500, fontSize: 26, letterSpacing: -0.5, height: 1.25, color: OneirColors.text)),
-                      const SizedBox(height: 8),
+                          style: OneirText.heading.copyWith(fontSize: 26, letterSpacing: -0.5, height: 1.25)),
+                      const SizedBox(height: OneirSpace.sm),
                       Text('This helps Vanya know what to focus on with you.',
-                          style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 13, color: OneirColors.textFaint)),
-                      const SizedBox(height: 24),
+                          style: OneirText.caption.copyWith(fontSize: 13, letterSpacing: 0)),
+                      const SizedBox(height: OneirSpace.xxl),
                       for (final reason in _reasons) ...[
                         OneirSelectionRow(
-                          leading: Icon(reason.icon, size: 20, color: _selected == reason.label ? OneirColors.text : OneirColors.textMuted),
+                          leading: Icon(reason.icon, size: 20, color: _selected == reason.label ? OneirColors.accent : OneirColors.textMuted),
                           label: reason.label,
                           selected: _selected == reason.label,
                           onTap: () => setState(() => _selected = reason.label),
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: OneirSpace.md - 2),
                       ],
                     ],
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: OneirSpace.lg),
               OneirPrimaryButton(label: "That's it, exactly", onPressed: _selected == null ? null : _handleContinue),
             ],
           ),

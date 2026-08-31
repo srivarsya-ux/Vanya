@@ -71,23 +71,8 @@ class _HelloScreenState extends ConsumerState<HelloScreen> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // TEMPORARY build-verification marker (v5 -- distinct
-                    // color from every earlier marker used in this project,
-                    // so there is no ambiguity about whether this exact
-                    // build reached the device). Remove once the canvas fix
-                    // is confirmed on-device.
-                    Container(
-                      color: Colors.deepOrange,
-                      padding: const EdgeInsets.symmetric(vertical: 6),
-                      child: const Text(
-                        'BUILD CHECK v5',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
                     OneirProgressHeader(progress: 1 / 18, onBack: widget.onBack),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: OneirSpace.sm),
                     // Per the brief: Vanya centered, very subtle greenery,
                     // large empty space, clean background -- no crowded
                     // scene. Fixed height, not Expanded -- Expanded needs a
@@ -102,21 +87,21 @@ class _HelloScreenState extends ConsumerState<HelloScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: OneirSpace.xl),
                     Text('Hello. I\'m Vanya.',
                         textAlign: TextAlign.center,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, fontSize: 32, letterSpacing: -0.6, height: 1.15, color: OneirColors.text)),
-                    const SizedBox(height: 10),
+                        style: OneirText.display.copyWith(fontSize: 32)),
+                    const SizedBox(height: OneirSpace.sm + 2),
                     Text(
                       "I'll help you build a healthier relationship with your apps.",
                       textAlign: TextAlign.center,
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 14, height: 1.5, color: OneirColors.textMuted),
+                      style: OneirText.body.copyWith(fontSize: 14),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: OneirSpace.xxl),
                     OneirPrimaryButton(label: 'Continue', onPressed: widget.onNext),
                   ],
                 ),

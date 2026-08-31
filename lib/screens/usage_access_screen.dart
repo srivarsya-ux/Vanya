@@ -60,32 +60,26 @@ class _UsageAccessScreenState extends State<UsageAccessScreen> with WidgetsBindi
 
   @override
   Widget build(BuildContext context) {
-    return OneirScaffold(
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(26, 20, 26, 24),
-          child: Column(
-            children: [
-              OneirProgressHeader(progress: 10 / 18, onBack: widget.onBack),
-              const Spacer(flex: 2),
-              const VanyaCharacter(expression: VanyaExpression.protecting, width: 168, height: 142),
-              const SizedBox(height: 24),
-              Text('Let me understand when protected apps are being opened.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w500, fontSize: 22, letterSpacing: -0.3, height: 1.35, color: OneirColors.text)),
-              const SizedBox(height: 16),
-              Text(
-                "This only tells me which app is open right now -- I don't see what's inside it. Turned on in your phone's Usage Access settings.",
-                textAlign: TextAlign.center,
-                style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 14, height: 1.6, color: OneirColors.textFaint),
-              ),
-              const Spacer(flex: 3),
-              _checking
-                  ? const CircularProgressIndicator()
-                  : OneirPrimaryButton(label: 'Open Settings', onPressed: _openSettings),
-            ],
+    return OneirScreen(
+      child: Column(
+        children: [
+          OneirProgressHeader(progress: 10 / 18, onBack: widget.onBack),
+          const Spacer(flex: 2),
+          const VanyaCharacter(expression: VanyaExpression.protecting, width: 168, height: 142),
+          const SizedBox(height: OneirSpace.xxl),
+          Text('Let me understand when protected apps are being opened.',
+              textAlign: TextAlign.center, style: OneirText.heading.copyWith(fontSize: 22, letterSpacing: -0.3, height: 1.35)),
+          const SizedBox(height: OneirSpace.lg),
+          Text(
+            "This only tells me which app is open right now -- I don't see what's inside it. Turned on in your phone's Usage Access settings.",
+            textAlign: TextAlign.center,
+            style: OneirText.body.copyWith(fontSize: 14, height: 1.6),
           ),
-        ),
+          const Spacer(flex: 3),
+          _checking
+              ? const CircularProgressIndicator(color: OneirColors.accent)
+              : OneirPrimaryButton(label: 'Open Settings', onPressed: _openSettings),
+        ],
       ),
     );
   }

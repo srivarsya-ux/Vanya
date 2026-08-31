@@ -83,21 +83,20 @@ class _ProtectedAppsScreenState extends ConsumerState<ProtectedAppsScreen> {
     final content = _loading
         ? const Center(child: CircularProgressIndicator())
         : SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+            padding: const EdgeInsets.fromLTRB(OneirSpace.xl, 0, OneirSpace.xl, OneirSpace.xl),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (!widget.isStandalone) ...[
-                  Text('Which apps pull you in?',
-                      style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w500, fontSize: 26, letterSpacing: -0.5, height: 1.25, color: OneirColors.text)),
-                  const SizedBox(height: 8),
+                  const Text('Which apps pull you in?', style: OneirText.heading),
+                  const SizedBox(height: OneirSpace.sm),
                   Text('Choose the apps you want Vanya to help you protect. You can change this anytime.',
-                      style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 14, height: 1.5, color: OneirColors.textFaint)),
-                  const SizedBox(height: 24),
+                      style: OneirText.body.copyWith(fontSize: 14, height: 1.5)),
+                  const SizedBox(height: OneirSpace.xxl),
                 ],
                 for (final app in _apps) ...[
                   _AppRow(app: app, isOn: _selected.contains(app.packageName), onTap: () => _toggle(app.packageName)),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: OneirSpace.md - 2),
                 ],
               ],
             ),
@@ -106,8 +105,8 @@ class _ProtectedAppsScreenState extends ConsumerState<ProtectedAppsScreen> {
     final footer = Column(
       children: [
         Text('${_selected.length} app${_selected.length == 1 ? '' : 's'} protected',
-            style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 13, color: OneirColors.textFaint)),
-        const SizedBox(height: 12),
+            style: OneirText.bodySmall.copyWith(color: OneirColors.textFaint)),
+        const SizedBox(height: OneirSpace.md),
         OneirPrimaryButton(
           label: _saving ? 'Saving...' : (widget.isStandalone ? 'Save' : "Let's protect these"),
           onPressed: (_selected.isEmpty || _saving || _loading) ? null : _handleContinue,
@@ -122,12 +121,12 @@ class _ProtectedAppsScreenState extends ConsumerState<ProtectedAppsScreen> {
           backgroundColor: OneirColors.background,
           elevation: 0,
           leading: IconButton(icon: const Icon(Icons.arrow_back, color: OneirColors.text), onPressed: () => Navigator.of(context).pop()),
-          title: const Text('Protected Apps', style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, color: OneirColors.text)),
+          title: Text('Protected Apps', style: OneirText.title.copyWith(fontSize: 17)),
         ),
         body: Column(
           children: [
             Expanded(child: content),
-            Padding(padding: const EdgeInsets.fromLTRB(20, 0, 20, 24), child: footer),
+            Padding(padding: const EdgeInsets.fromLTRB(OneirSpace.xl, 0, OneirSpace.xl, OneirSpace.xxl), child: footer),
           ],
         ),
       );
@@ -141,20 +140,15 @@ class _ProtectedAppsScreenState extends ConsumerState<ProtectedAppsScreen> {
     // could sit closer to (or under) the status bar than every other step
     // in the same onboarding flow -- exactly the kind of screen-to-screen
     // misalignment this was fixed for.
-    return OneirScaffold(
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(26, 20, 26, 24),
-          child: Column(
-            children: [
-              OneirProgressHeader(progress: 6 / 18, onBack: widget.onBack),
-              const SizedBox(height: 16),
-              Expanded(child: content),
-              const SizedBox(height: 16),
-              footer,
-            ],
-          ),
-        ),
+    return OneirScreen(
+      child: Column(
+        children: [
+          OneirProgressHeader(progress: 6 / 18, onBack: widget.onBack),
+          const SizedBox(height: OneirSpace.lg),
+          Expanded(child: content),
+          const SizedBox(height: OneirSpace.lg),
+          footer,
+        ],
       ),
     );
   }
@@ -172,18 +166,18 @@ class _AppRow extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: OneirSpace.md + 2, vertical: OneirSpace.sm + 2),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: isOn ? OneirColors.text : const Color(0xFFE5E5E5), width: isOn ? 1.5 : 1),
-          color: isOn ? const Color(0xFFF7F6FC) : const Color(0xFFFAFAFA),
+          borderRadius: BorderRadius.circular(OneirRadius.md),
+          border: Border.all(color: isOn ? OneirColors.accent : OneirColors.border, width: isOn ? 1.4 : 1),
+          color: isOn ? OneirColors.accentSoft : OneirColors.surface,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Row(children: [
               ClipRRect(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(OneirRadius.sm),
                 child: app.iconBytes != null
                     ? Image.memory(app.iconBytes!, width: 36, height: 36, fit: BoxFit.cover)
                     : Container(
@@ -192,17 +186,17 @@ class _AppRow extends StatelessWidget {
                         alignment: Alignment.center,
                         child: Text(
                           app.label.isNotEmpty ? app.label[0].toUpperCase() : '?',
-                          style: const TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white),
+                          style: OneirText.bodySmall.copyWith(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white),
                         ),
                       ),
               ),
-              const SizedBox(width: 12),
-              Text(app.label, style: const TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 14, fontWeight: FontWeight.w500, color: OneirColors.text)),
+              const SizedBox(width: OneirSpace.md),
+              Text(app.label, style: OneirText.bodyStrong.copyWith(fontSize: 14)),
             ]),
             AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               width: 40, height: 24,
-              decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), color: isOn ? OneirColors.text : const Color(0xFFDADADA)),
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(OneirRadius.sm), color: isOn ? OneirColors.accent : OneirColors.borderStrong),
               child: AnimatedAlign(
                 duration: const Duration(milliseconds: 200),
                 curve: Curves.easeOutBack,
@@ -210,7 +204,7 @@ class _AppRow extends StatelessWidget {
                 child: Container(
                   width: 18, height: 18,
                   margin: const EdgeInsets.symmetric(horizontal: 3),
-                  decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white, boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 3)]),
+                  decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white, boxShadow: OneirElevation.subtle),
                 ),
               ),
             ),

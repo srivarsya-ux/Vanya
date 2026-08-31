@@ -16,33 +16,33 @@ class CoKeeperIntroScreen extends StatelessWidget {
     return OneirScaffold(
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(26, 20, 26, 24),
+          padding: const EdgeInsets.fromLTRB(OneirSpace.screenMargin, OneirSpace.xl, OneirSpace.screenMargin, OneirSpace.xxl),
           child: Column(
             children: [
               OneirProgressHeader(progress: 8 / 18, onBack: onBack),
-              const SizedBox(height: 8),
+              const SizedBox(height: OneirSpace.sm),
               Expanded(
                 flex: 3,
                 child: Center(
                   child: const VanyaCharacter(expression: VanyaExpression.protecting, width: 232, height: 245),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: OneirSpace.lg),
               Text("Here's where I do something a little differently.",
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w500, fontSize: 22, letterSpacing: -0.3, height: 1.3, color: OneirColors.text)),
-              const SizedBox(height: 16),
+                  style: OneirText.heading),
+              const SizedBox(height: OneirSpace.lg),
               FlowDiagram(steps: const ['Protected App', 'Vanya Intervention', 'Pause', 'Decision', 'Co-Keeper can unlock']),
-              const SizedBox(height: 16),
+              const SizedBox(height: OneirSpace.lg),
               Text(
                 "Your Co-Keeper is someone you trust who holds the key. "
                 "They're not controlling your phone -- they simply give you an external layer of accountability.",
                 textAlign: TextAlign.center,
-                style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 13.5, height: 1.6, color: OneirColors.textMuted),
+                style: OneirText.bodySmall,
               ),
               const Spacer(),
               OneirPrimaryButton(label: 'Choose your Co-Keeper', onPressed: onNext),
-              const SizedBox(height: 10),
+              const SizedBox(height: OneirSpace.sm + 2),
               OneirSecondaryButton(label: 'Maybe Later', onPressed: onSkip),
             ],
           ),
@@ -70,9 +70,9 @@ class FlowDiagram extends StatelessWidget {
       children: [
         for (var i = 0; i < steps.length; i++) ...[
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(color: OneirColors.cardNeutral, borderRadius: BorderRadius.circular(12)),
-            child: Text(steps[i], style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 11.5, fontWeight: FontWeight.w500, color: OneirColors.text)),
+            padding: const EdgeInsets.symmetric(horizontal: OneirSpace.sm + 2, vertical: OneirSpace.xs + 2),
+            decoration: BoxDecoration(color: OneirColors.surfaceSunken, borderRadius: BorderRadius.circular(OneirRadius.sm)),
+            child: Text(steps[i], style: OneirText.caption.copyWith(color: OneirColors.text)),
           ),
           if (i < steps.length - 1) Icon(Icons.arrow_forward, size: 14, color: OneirColors.textFaint),
         ],
@@ -169,12 +169,12 @@ class _CoKeeperInviteScreenState extends State<CoKeeperInviteScreen> {
     return OneirScaffold(
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(26, 20, 26, 40),
+          padding: const EdgeInsets.fromLTRB(OneirSpace.screenMargin, OneirSpace.xl, OneirSpace.screenMargin, OneirSpace.huge),
           child: Column(children: [
             OneirProgressHeader(progress: subProgress, onBack: _backWithinFlow),
-            const SizedBox(height: 16),
+            const SizedBox(height: OneirSpace.lg),
             Expanded(child: SingleChildScrollView(child: content)),
-            const SizedBox(height: 16),
+            const SizedBox(height: OneirSpace.lg),
             button,
           ]),
         ),
@@ -184,36 +184,28 @@ class _CoKeeperInviteScreenState extends State<CoKeeperInviteScreen> {
 
   Widget _stepRelationContent() {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text('Who helps you stay on track?',
-          style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w500, fontSize: 22, height: 1.3, color: OneirColors.text)),
-      const SizedBox(height: 24),
+      Text('Who helps you stay on track?', style: OneirText.heading),
+      const SizedBox(height: OneirSpace.xxl),
       for (final r in _relations) ...[
         OneirSelectionRow(label: r, selected: _relation == r, onTap: () => setState(() => _relation = r)),
-        const SizedBox(height: 10),
+        const SizedBox(height: OneirSpace.sm + 2),
       ],
     ]);
   }
 
   Widget _stepContactContent() {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text('How should we reach them?',
-          style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w500, fontSize: 22, height: 1.3, color: OneirColors.text)),
-      const SizedBox(height: 24),
+      Text('How should we reach them?', style: OneirText.heading),
+      const SizedBox(height: OneirSpace.xxl),
       OneirSelectionRow(label: 'Choose from contacts', selected: _contactMode == 'contacts', onTap: () => setState(() => _contactMode = 'contacts')),
-      const SizedBox(height: 10),
+      const SizedBox(height: OneirSpace.sm + 2),
       OneirSelectionRow(label: 'Type manually', selected: _contactMode == 'manual', onTap: () => setState(() => _contactMode = 'manual')),
       if (_contactMode == 'manual') ...[
-        const SizedBox(height: 10),
-        TextField(
+        const SizedBox(height: OneirSpace.sm + 2),
+        OneirTextField(
           controller: _contactController,
+          hintText: "${_relation ?? 'Their'}'s phone or email",
           onChanged: (_) => setState(() {}),
-          decoration: InputDecoration(
-            hintText: "${_relation ?? 'Their'}'s phone or email",
-            filled: true,
-            fillColor: OneirColors.inputFill,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          ),
         ),
       ],
     ]);
@@ -236,28 +228,28 @@ class _CoKeeperInviteScreenState extends State<CoKeeperInviteScreen> {
       // for a "staying connected" moment, matching what's actually
       // happening here (composing an invite to send).
       const Center(child: VanyaCharacter(expression: VanyaExpression.messaging, width: 180, height: 129)),
-      const SizedBox(height: 16),
-      Text('Invite $_relation', style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w500, fontSize: 22, height: 1.3, color: OneirColors.text)),
-      const SizedBox(height: 18),
-      Container(
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(color: const Color(0xFFFAFAFA), border: Border.all(color: const Color(0xFFE5E5E5)), borderRadius: BorderRadius.circular(18)),
-        child: Text(_inviteMessage, style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 13.5, height: 1.6, color: OneirColors.textMuted)),
+      const SizedBox(height: OneirSpace.lg),
+      Text('Invite $_relation', style: OneirText.heading),
+      const SizedBox(height: OneirSpace.lg + 2),
+      OneirCard(
+        padding: const EdgeInsets.all(OneirSpace.lg + 2),
+        color: OneirColors.surfaceSunken,
+        child: Text(_inviteMessage, style: OneirText.bodySmall),
       ),
     ]);
   }
 
   Widget _stepCelebrationContent() {
     return Padding(
-      padding: const EdgeInsets.only(top: 60),
+      padding: const EdgeInsets.only(top: OneirSpace.huge + OneirSpace.xl),
       child: Column(children: [
         // "The key has found a safe home" -- literally an unlocking/key
         // moment, so she holds the key rather than just waving.
         const VanyaCharacter(expression: VanyaExpression.unlocking, width: 206, height: 180),
-        const SizedBox(height: 20),
-        Text('The key has found a safe home.', style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w500, fontSize: 20, color: OneirColors.text)),
-        const SizedBox(height: 10),
-        Text('$_relation will be notified once they accept.', style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 14, color: OneirColors.textFaint)),
+        const SizedBox(height: OneirSpace.xxl - 4),
+        Text('The key has found a safe home.', style: OneirText.title.copyWith(fontSize: 20)),
+        const SizedBox(height: OneirSpace.sm + 2),
+        Text('$_relation will be notified once they accept.', style: OneirText.bodySmall.copyWith(color: OneirColors.textFaint)),
       ]),
     );
   }

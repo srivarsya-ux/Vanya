@@ -45,7 +45,7 @@ class _NameEntryScreenState extends State<NameEntryScreen> {
           child: Column(
             children: [
               OneirProgressHeader(progress: 4 / 18, onBack: widget.onBack),
-              const SizedBox(height: 16),
+              const SizedBox(height: OneirSpace.lg),
               // She's waiting on an answer -- the same attentive pose used
               // anywhere else Vanya is genuinely listening for a reply.
               const Expanded(
@@ -54,28 +54,29 @@ class _NameEntryScreenState extends State<NameEntryScreen> {
                   child: VanyaCharacter(expression: VanyaExpression.listening, width: 235, height: 287),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: OneirSpace.lg),
               Text("What's your name?", textAlign: TextAlign.center, style: OneirText.heading.copyWith(fontSize: 30, height: 1.2)),
-              const SizedBox(height: 24),
+              const SizedBox(height: OneirSpace.xxl),
               SizedBox(
                 width: 224,
                 height: 56,
                 child: TextField(
                   controller: widget.nameController,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 16, color: OneirColors.text),
+                  style: OneirText.bodyStrong.copyWith(fontSize: 16, color: OneirColors.text),
+                  cursorColor: OneirColors.accent,
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: OneirColors.inputFill,
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(OneirRadius.md),
                       borderSide: BorderSide.none,
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: const BorderSide(color: OneirColors.text, width: 1.5),
+                      borderRadius: BorderRadius.circular(OneirRadius.md),
+                      borderSide: const BorderSide(color: OneirColors.accent, width: 1.4),
                     ),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: OneirSpace.lg),
                   ),
                 ),
               ),

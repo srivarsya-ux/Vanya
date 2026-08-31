@@ -86,31 +86,23 @@ class _TasksScreenState extends State<TasksScreen> {
         backgroundColor: OneirColors.background,
         elevation: 0,
         leading: IconButton(icon: const Icon(Icons.arrow_back, color: OneirColors.text), onPressed: () => Navigator.of(context).pop()),
-        title: const Text('Tasks', style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, color: OneirColors.text)),
+        title: Text('Tasks', style: OneirText.title.copyWith(fontSize: 18)),
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator(color: OneirColors.accent))
           : Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+                  padding: const EdgeInsets.fromLTRB(OneirSpace.xl, OneirSpace.sm, OneirSpace.xl, OneirSpace.md),
                   child: Row(children: [
                     Expanded(
-                      child: TextField(
+                      child: OneirTextField(
                         controller: _controller,
-                        focusNode: _addFieldFocusNode,
+                        hintText: 'Add a task...',
                         onSubmitted: (_) => _addTask(),
-                        style: const TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 14, color: OneirColors.text),
-                        decoration: InputDecoration(
-                          hintText: 'Add a task...',
-                          filled: true,
-                          fillColor: OneirColors.inputFill,
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                        ),
                       ),
                     ),
-                    const SizedBox(width: 10),
+                    const SizedBox(width: OneirSpace.sm + 2),
                     Material(
                       color: OneirColors.accent,
                       shape: const CircleBorder(),
@@ -125,18 +117,22 @@ class _TasksScreenState extends State<TasksScreen> {
                 Expanded(
                   child: _tasks.isEmpty
                       ? Center(
-                          child: Text('No tasks yet -- add one above.', style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 13, color: OneirColors.textFaint)),
+                          child: Text('No tasks yet -- add one above.', style: OneirText.bodySmall.copyWith(color: OneirColors.textFaint)),
                         )
                       : ListView.builder(
-                          padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                          padding: const EdgeInsets.fromLTRB(OneirSpace.xl, 0, OneirSpace.xl, OneirSpace.xl),
                           itemCount: _tasks.length,
                           itemBuilder: (context, i) {
                             final task = _tasks[i];
                             final done = task['done'] as bool;
                             return Container(
-                              margin: const EdgeInsets.only(bottom: 8),
-                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
-                              decoration: BoxDecoration(color: OneirColors.cardNeutral, borderRadius: BorderRadius.circular(14)),
+                              margin: const EdgeInsets.only(bottom: OneirSpace.sm),
+                              padding: const EdgeInsets.symmetric(horizontal: OneirSpace.md + 2, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: OneirColors.surface,
+                                borderRadius: BorderRadius.circular(OneirRadius.md),
+                                border: Border.all(color: OneirColors.border),
+                              ),
                               child: Row(children: [
                                 Checkbox(
                                   value: done,
@@ -147,16 +143,13 @@ class _TasksScreenState extends State<TasksScreen> {
                                 Expanded(
                                   child: Text(
                                     task['label'] as String,
-                                    style: TextStyle(
-                                      fontFamily: 'PlusJakartaSans',
-                                      fontSize: 14,
-                                      color: done ? OneirColors.textFaint : OneirColors.text,
+                                    style: (done ? OneirText.bodyStrong.copyWith(color: OneirColors.textFaint) : OneirText.bodyStrong).copyWith(
                                       decoration: done ? TextDecoration.lineThrough : TextDecoration.none,
                                     ),
                                   ),
                                 ),
                                 IconButton(
-                                  icon: Icon(Icons.close, size: 18, color: OneirColors.textFaint),
+                                  icon: const Icon(Icons.close, size: 18, color: OneirColors.textFaint),
                                   onPressed: () => _remove(i),
                                 ),
                               ]),

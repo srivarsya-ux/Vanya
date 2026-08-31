@@ -89,28 +89,28 @@ class _VanyaAiTestScreenState extends State<VanyaAiTestScreen> {
         ),
         title: const Text(
           'Vanya AI (on-device, dev)',
-          style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, color: OneirColors.text),
+          style: OneirText.title,
         ),
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+        padding: const EdgeInsets.fromLTRB(OneirSpace.xl, OneirSpace.sm, OneirSpace.xl, OneirSpace.xxxl),
         children: [
           _statusCard(),
-          const SizedBox(height: 16),
+          const SizedBox(height: OneirSpace.lg),
           _specCard(),
-          const SizedBox(height: 20),
+          const SizedBox(height: OneirSpace.xl),
           Text(
             'Prompt',
-            style: const TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, fontSize: 14, color: OneirColors.text),
+            style: OneirText.bodyStrong.copyWith(fontWeight: FontWeight.w600, fontSize: 14),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: OneirSpace.sm),
           _promptField(),
-          const SizedBox(height: 14),
+          const SizedBox(height: OneirSpace.md + 2),
           OneirPrimaryButton(
             label: _asking ? 'Thinking...' : 'Ask Vanya',
             onPressed: (_service.isReady && !_asking) ? _ask : null,
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: OneirSpace.xl),
           _responseArea(),
         ],
       ),
@@ -144,28 +144,27 @@ class _VanyaAiTestScreenState extends State<VanyaAiTestScreen> {
         break;
     }
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: OneirColors.cardNeutral, borderRadius: BorderRadius.circular(16)),
+    return OneirCard(
+      padding: const EdgeInsets.all(OneirSpace.lg),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
               Container(width: 10, height: 10, decoration: BoxDecoration(color: dot, shape: BoxShape.circle)),
-              const SizedBox(width: 10),
+              const SizedBox(width: OneirSpace.sm + 2),
               Expanded(
                 child: Text(
                   label,
-                  style: const TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, fontSize: 14, color: OneirColors.text),
+                  style: OneirText.bodyStrong.copyWith(fontWeight: FontWeight.w600, fontSize: 14),
                 ),
               ),
             ],
           ),
           if (_service.isBusy) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: OneirSpace.md),
             ClipRRect(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(4),
               child: LinearProgressIndicator(
                 value: status == VanyaAiStatus.downloading && _service.downloadProgress > 0 ? _service.downloadProgress : null,
                 minHeight: 6,
@@ -175,13 +174,13 @@ class _VanyaAiTestScreenState extends State<VanyaAiTestScreen> {
             ),
           ],
           if (status == VanyaAiStatus.error && _service.errorMessage != null) ...[
-            const SizedBox(height: 10),
+            const SizedBox(height: OneirSpace.sm + 2),
             Text(
               _service.errorMessage!,
-              style: const TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 13, color: OneirColors.textMuted, height: 1.4),
+              style: OneirText.bodySmall.copyWith(color: OneirColors.textMuted, height: 1.4),
             ),
           ],
-          const SizedBox(height: 14),
+          const SizedBox(height: OneirSpace.md + 2),
           SizedBox(
             width: double.infinity,
             child: OneirSecondaryButton(
@@ -201,25 +200,22 @@ class _VanyaAiTestScreenState extends State<VanyaAiTestScreen> {
   }
 
   Widget _specCard() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: OneirColors.background,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: OneirColors.border),
-      ),
+    return OneirCard(
+      padding: const EdgeInsets.all(OneirSpace.lg),
+      color: OneirColors.background,
+      elevated: false,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'About this model',
-            style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, fontSize: 13, color: OneirColors.text),
+            style: OneirText.bodyStrong.copyWith(fontWeight: FontWeight.w600, fontSize: 13),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: OneirSpace.sm - 2),
           Text(
             'Gemma 4 E2B, on-device via LiteRT-LM. ~${VanyaLocalModelInfo.approxDownloadBytes ~/ (1024 * 1024)}MB one-time '
             'download, no account or API key needed to fetch it. ${VanyaLocalModelInfo.recommendedDeviceSpec}',
-            style: const TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 12, color: OneirColors.textFaint, height: 1.4),
+            style: OneirText.caption.copyWith(height: 1.4),
           ),
         ],
       ),
@@ -227,53 +223,43 @@ class _VanyaAiTestScreenState extends State<VanyaAiTestScreen> {
   }
 
   Widget _promptField() {
-    return TextField(
+    return OneirTextField(
       controller: _promptController,
       maxLines: 4,
-      style: const TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 14, color: OneirColors.text),
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: OneirColors.inputFill,
-        contentPadding: const EdgeInsets.all(14),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
-        hintText: 'Type a prompt for Vanya...',
-      ),
+      hintText: 'Type a prompt for Vanya...',
     );
   }
 
   Widget _responseArea() {
     if (_asking) {
       return const Padding(
-        padding: EdgeInsets.symmetric(vertical: 24),
+        padding: EdgeInsets.symmetric(vertical: OneirSpace.xxl),
         child: Center(child: CircularProgressIndicator(color: OneirColors.accent)),
       );
     }
     if (_askError != null) {
-      return Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(color: OneirColors.cardNeutral, borderRadius: BorderRadius.circular(16)),
+      return OneirCard(
+        padding: const EdgeInsets.all(OneirSpace.lg),
         child: Text(
           _askError!,
-          style: const TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 13, color: OneirColors.textMuted, height: 1.4),
+          style: OneirText.bodySmall.copyWith(color: OneirColors.textMuted, height: 1.4),
         ),
       );
     }
     if (_response != null) {
-      return Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(color: OneirColors.cardNeutral, borderRadius: BorderRadius.circular(16)),
+      return OneirCard(
+        padding: const EdgeInsets.all(OneirSpace.lg),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               "Vanya's response",
-              style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, fontSize: 13, color: OneirColors.text),
+              style: OneirText.bodyStrong.copyWith(fontWeight: FontWeight.w600, fontSize: 13),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: OneirSpace.sm),
             Text(
               _response!,
-              style: const TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 15, color: OneirColors.text, height: 1.5),
+              style: OneirText.body.copyWith(color: OneirColors.text, height: 1.5),
             ),
           ],
         ),

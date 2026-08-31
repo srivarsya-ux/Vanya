@@ -19,33 +19,35 @@ class AddWidgetsScreen extends StatelessWidget {
         backgroundColor: OneirColors.background,
         elevation: 0,
         leading: IconButton(icon: const Icon(Icons.arrow_back, color: OneirColors.text), onPressed: () => Navigator.of(context).pop()),
-        title: const Text('Widgets', style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, color: OneirColors.text)),
+        title: Text('Widgets', style: OneirText.title),
       ),
       body: ListView(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(OneirSpace.xl),
         children: [
-          const Text(
+          Text(
             "Add Oneir's widgets to your home screen so today's tasks are visible before you even open the app.",
-            style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 14, color: OneirColors.textMuted, height: 1.5),
+            style: OneirText.body,
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: OneirSpace.xl),
           const OneirStreakWidgetCard(title: "Today's Adventure", currentDay: 0, totalDays: 1),
-          const SizedBox(height: 12),
+          const SizedBox(height: OneirSpace.md),
           const OneirStreakWidgetCard(title: 'Focus Streak', currentDay: 3, totalDays: 30),
-          const SizedBox(height: 24),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: OneirColors.cardNeutral, borderRadius: BorderRadius.circular(16)),
-            child: const Column(
+          const SizedBox(height: OneirSpace.xxl),
+          OneirCard(
+            padding: const EdgeInsets.all(OneirSpace.lg),
+            color: OneirColors.surfaceSunken,
+            bordered: false,
+            elevated: false,
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('How to add a widget', style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, fontSize: 14, color: OneirColors.text)),
-                SizedBox(height: 8),
+                Text('How to add a widget', style: OneirText.bodyStrong.copyWith(fontSize: 14)),
+                const SizedBox(height: OneirSpace.sm),
                 Text(
                   '1. Long-press an empty area of your home screen\n'
                   '2. Tap Widgets\n'
                   '3. Find Oneir and drag your widget into place',
-                  style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 13, color: OneirColors.textMuted, height: 1.6),
+                  style: OneirText.bodySmall,
                 ),
               ],
             ),

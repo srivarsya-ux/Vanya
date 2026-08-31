@@ -33,55 +33,50 @@ class EnableProtectionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return OneirScaffold(
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(26, 20, 26, 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              OneirProgressHeader(progress: 9 / 18, onBack: onBack),
-              const SizedBox(height: 16),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Center(
-                        child: VanyaCharacter(expression: VanyaExpression.protecting, width: 180, height: 168),
-                      ),
-                      const SizedBox(height: 16),
-                      const Text('A few permissions',
-                          style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w500, fontSize: 26, letterSpacing: -0.5, height: 1.25, color: OneirColors.text)),
-                      const SizedBox(height: 8),
-                      const Text("Here's what I'll ask for next, and why -- you'll approve each one yourself.",
-                          style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 14, height: 1.5, color: OneirColors.textFaint)),
-                      const SizedBox(height: 24),
-                      for (final p in _permissions) ...[
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(color: OneirColors.cardNeutral, borderRadius: BorderRadius.circular(16)),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(p.label, style: const TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, fontSize: 15, color: OneirColors.text)),
-                              const SizedBox(height: 4),
-                              Text(p.reason, style: const TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 13, height: 1.4, color: OneirColors.textMuted)),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                      ],
-                    ],
+    return OneirScreen(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          OneirProgressHeader(progress: 9 / 18, onBack: onBack),
+          const SizedBox(height: OneirSpace.lg),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: VanyaCharacter(expression: VanyaExpression.protecting, width: 180, height: 168),
                   ),
-                ),
+                  const SizedBox(height: OneirSpace.lg),
+                  const Text('A few permissions', style: OneirText.heading),
+                  const SizedBox(height: OneirSpace.sm),
+                  Text("Here's what I'll ask for next, and why -- you'll approve each one yourself.",
+                      style: OneirText.body.copyWith(fontSize: 14, height: 1.5)),
+                  const SizedBox(height: OneirSpace.xxl),
+                  for (final p in _permissions) ...[
+                    OneirCard(
+                      padding: const EdgeInsets.all(OneirSpace.lg),
+                      elevated: false,
+                      bordered: false,
+                      color: OneirColors.surfaceSunken,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(p.label, style: OneirText.title.copyWith(fontSize: 15)),
+                          const SizedBox(height: OneirSpace.xs),
+                          Text(p.reason, style: OneirText.bodySmall.copyWith(height: 1.4)),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: OneirSpace.md - 2),
+                  ],
+                ],
               ),
-              const SizedBox(height: 16),
-              OneirPrimaryButton(label: "Got it, let's go", onPressed: onNext),
-            ],
+            ),
           ),
-        ),
+          const SizedBox(height: OneirSpace.lg),
+          OneirPrimaryButton(label: "Got it, let's go", onPressed: onNext),
+        ],
       ),
     );
   }

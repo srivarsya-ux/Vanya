@@ -114,6 +114,19 @@ class _InterventionConversationScreenState extends ConsumerState<InterventionCon
     final state = ref.watch(interventionControllerProvider);
     final voiceState = ref.watch(voiceQueueControllerProvider);
 
+    // Live-dictation fix: the transcript used to only ever appear as a
+    // small italic preview line below the input box while the real
+    // TextField stayed empty the whole time -- easy to mistake for
+    // dictation just not working. This mirrors it straight into the real
+    // text field as it comes in, cursor kept at the end, same as
+    // dictation behaves anywhere else on the phone.
+    ref.listen(speechInputControllerProvider, (previous, next) {
+      if (!next.isListening) return;
+      if (next.transcript == previous?.transcript) return;
+      _controller.text = next.transcript;
+      _controller.selection = TextSelection.collapsed(offset: _controller.text.length);
+    });
+
     ref.listen(interventionControllerProvider, (previous, next) {
       if (next?.stage == InterventionStage.closed) {
         if (next?.lastDecision?.decision == InterventionDecisionType.allow) {
@@ -128,18 +141,29 @@ class _InterventionConversationScreenState extends ConsumerState<InterventionCon
     });
 
     if (state == null) {
-      return const Scaffold(backgroundColor: Colors.black26, body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(
+        backgroundColor: OneirColors.background,
+        body: Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(OneirColors.accent))),
+      );
     }
 
+    // A warm, calm scrim rather than a harsh pure-black overlay, and an
+    // ivory card with the app's standard soft shadow/border -- this should
+    // read as a caring check-in, not a system alert or blocker.
     return Scaffold(
-      backgroundColor: Colors.black.withOpacity(0.55),
+      backgroundColor: OneirColors.text.withOpacity(0.45),
       body: SafeArea(
         child: Center(
           child: Container(
             width: 340,
             constraints: const BoxConstraints(maxHeight: 660),
-            padding: const EdgeInsets.fromLTRB(24, 16, 24, 20),
-            decoration: BoxDecoration(color: OneirColors.background, borderRadius: BorderRadius.circular(28)),
+            padding: const EdgeInsets.fromLTRB(OneirSpace.xxl, OneirSpace.lg, OneirSpace.xxl, OneirSpace.xl),
+            decoration: BoxDecoration(
+              color: OneirColors.surface,
+              borderRadius: BorderRadius.circular(OneirRadius.xl),
+              border: Border.all(color: OneirColors.border),
+              boxShadow: OneirElevation.card,
+            ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -153,11 +177,17 @@ class _InterventionConversationScreenState extends ConsumerState<InterventionCon
                   audio: voiceState.currentAudioPath,
                   lipSyncData: voiceState.currentLipSyncTimeline,
                   isSpeaking: voiceState.isSpeaking,
-                  size: 162,
+                  // 108, not the old 162 -- the bunny body art is a tall
+                  // portrait (997x1720), not the square face-crop the old
+                  // photo-based version used, so the same width now comes
+                  // out much taller. 108 keeps the full card comfortably
+                  // inside its 660 maxHeight alongside the conversation
+                  // content below, without a UI redesign of this screen.
+                  size: 108,
                   lineColor: OneirColors.text,
                   accentColor: OneirColors.text,
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: OneirSpace.md),
                 Flexible(child: _buildStageContent(state)),
               ],
             ),
@@ -170,7 +200,10 @@ class _InterventionConversationScreenState extends ConsumerState<InterventionCon
   Widget _buildStageContent(InterventionState state) {
     switch (state.stage) {
       case InterventionStage.detecting:
-        return const SizedBox(height: 40, child: Center(child: CircularProgressIndicator()));
+        return const SizedBox(
+          height: 40,
+          child: Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(OneirColors.accent))),
+        );
 
       case InterventionStage.speaking:
         return _headline('Hi. What are you hoping to do?');
@@ -182,33 +215,35 @@ class _InterventionConversationScreenState extends ConsumerState<InterventionCon
       case InterventionStage.thinking:
         return Column(mainAxisSize: MainAxisSize.min, children: [
           _conversationHistory(state),
-          const SizedBox(height: 16),
-          const SizedBox(height: 24, width: 24, child: CircularProgressIndicator(strokeWidth: 2)),
+          const SizedBox(height: OneirSpace.lg),
+          const SizedBox(
+            height: 24,
+            width: 24,
+            child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation(OneirColors.accent)),
+          ),
         ]);
 
       case InterventionStage.decided:
         return Column(mainAxisSize: MainAxisSize.min, children: [
           _headline(state.lastDecision?.reply ?? ''),
-          const SizedBox(height: 20),
+          const SizedBox(height: OneirSpace.xl),
           OneirPrimaryButton(label: 'Okay', onPressed: () => ref.read(interventionControllerProvider.notifier).close()),
         ]);
 
       case InterventionStage.sessionActive:
         return Column(mainAxisSize: MainAxisSize.min, children: [
-          Text("You're set for ${widget.appLabel}.",
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w500, fontSize: 18, color: OneirColors.text)),
-          const SizedBox(height: 8),
-          const Text("I'll check back in when your time is up.",
-              textAlign: TextAlign.center, style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 13, color: OneirColors.textFaint)),
+          Text("You're set for ${widget.appLabel}.", textAlign: TextAlign.center, style: OneirText.title),
+          const SizedBox(height: OneirSpace.sm),
+          Text("I'll check back in when your time is up.",
+              textAlign: TextAlign.center, style: OneirText.bodySmall.copyWith(color: OneirColors.textFaint)),
         ]);
 
       case InterventionStage.reLockPrompt:
         return Column(mainAxisSize: MainAxisSize.min, children: [
           _headline('Have you finished?'),
-          const SizedBox(height: 20),
+          const SizedBox(height: OneirSpace.xl),
           OneirPrimaryButton(label: "Yes, I'm done", onPressed: () => ref.read(interventionControllerProvider.notifier).confirmSessionFinished()),
-          const SizedBox(height: 10),
+          const SizedBox(height: OneirSpace.md),
           OneirSecondaryButton(
             label: 'Not quite, one more moment',
             onPressed: () => _showMoreTimeSheet(state),
@@ -254,13 +289,13 @@ class _InterventionConversationScreenState extends ConsumerState<InterventionCon
   Widget _quickResponseView(QuickReasonResponse response) {
     return Column(mainAxisSize: MainAxisSize.min, children: [
       _headline(response.dialogue),
-      const SizedBox(height: 20),
+      const SizedBox(height: OneirSpace.xl),
       for (var i = 0; i < response.actions.length; i++) ...[
         if (i == 0)
           OneirPrimaryButton(label: _actionLabel(response.actions[i]), onPressed: () => _handleQuickAction(response.actions[i]))
         else
           OneirSecondaryButton(label: _actionLabel(response.actions[i]), onPressed: () => _handleQuickAction(response.actions[i])),
-        if (i < response.actions.length - 1) const SizedBox(height: 10),
+        if (i < response.actions.length - 1) const SizedBox(height: OneirSpace.md),
       ],
     ]);
   }
@@ -269,7 +304,7 @@ class _InterventionConversationScreenState extends ConsumerState<InterventionCon
     return Text(
       text,
       textAlign: TextAlign.center,
-      style: const TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w500, fontSize: 18, height: 1.4, color: OneirColors.text),
+      style: OneirText.title.copyWith(height: 1.4),
     );
   }
 
@@ -298,60 +333,48 @@ class _InterventionConversationScreenState extends ConsumerState<InterventionCon
       children: [
         if (state.history.isNotEmpty) ...[
           _conversationHistory(state),
-          const SizedBox(height: 8),
+          const SizedBox(height: OneirSpace.sm),
         ],
         _headline(question),
-        const SizedBox(height: 16),
+        const SizedBox(height: OneirSpace.lg),
         // Quick-select reasons -- a fast local branch that sits alongside
         // the free-text AI conversation below, not a replacement for it.
         // Only shown on the initial ask, not on the AI's own follow-up
         // clarifying questions (a different context).
         if (state.stage == InterventionStage.awaitingInput) ...[
           _QuickReasonChips(onSelected: _handleQuickReason),
-          const SizedBox(height: 14),
+          const SizedBox(height: OneirSpace.lg),
           Row(children: [
-            Expanded(child: Divider(color: OneirColors.border)),
+            const Expanded(child: Divider(color: OneirColors.border)),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: Text('or tell me more', style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 12, color: OneirColors.textFaint)),
+              padding: const EdgeInsets.symmetric(horizontal: OneirSpace.sm + 2),
+              child: Text('or tell me more', style: OneirText.caption),
             ),
-            Expanded(child: Divider(color: OneirColors.border)),
+            const Expanded(child: Divider(color: OneirColors.border)),
           ]),
-          const SizedBox(height: 14),
+          const SizedBox(height: OneirSpace.lg),
         ],
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(
-              child: TextField(
-                controller: _controller,
-                autofocus: true,
-                maxLines: 2,
-                onChanged: _onTextChanged,
-                onSubmitted: (_) => _submit(),
-                style: const TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 14, color: OneirColors.text),
-                decoration: InputDecoration(
-                  hintText: speech.isListening ? 'Listening...' : 'Type or tap the mic to speak...',
-                  filled: true,
-                  fillColor: OneirColors.inputFill,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-            // Voice input -- "support text or voice replies." Tapping starts
-            // listening (interrupting Vanya if she's mid-sentence, same as
-            // typing does); tapping again stops and auto-submits whatever
-            // was transcribed.
-            Material(
-              color: speech.isListening ? OneirColors.accent : OneirColors.inputFill,
+        // Restyled with OneirTextField's warm-fill visual language; the mic
+        // button rides in the field's suffix slot rather than sitting in a
+        // separate Row, but the controller/onChanged/onSubmitted wiring
+        // that drives dictation and interruption is unchanged.
+        OneirTextField(
+          controller: _controller,
+          autofocus: true,
+          maxLines: 2,
+          onChanged: _onTextChanged,
+          onSubmitted: (_) => _submit(),
+          hintText: speech.isListening ? 'Listening...' : 'Type or tap the mic to speak...',
+          suffix: Padding(
+            padding: const EdgeInsets.all(OneirSpace.xs),
+            child: Material(
+              color: speech.isListening ? OneirColors.accent : OneirColors.surfaceSunken,
               shape: const CircleBorder(),
               child: InkWell(
                 customBorder: const CircleBorder(),
                 onTap: _toggleMic,
                 child: Padding(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(OneirSpace.sm),
                   child: Icon(
                     speech.isListening ? Icons.mic : Icons.mic_none,
                     size: 20,
@@ -360,14 +383,9 @@ class _InterventionConversationScreenState extends ConsumerState<InterventionCon
                 ),
               ),
             ),
-          ],
+          ),
         ),
-        if (speech.isListening && speech.transcript.isNotEmpty) ...[
-          const SizedBox(height: 8),
-          Text(speech.transcript,
-              style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 12, color: OneirColors.textFaint, fontStyle: FontStyle.italic)),
-        ],
-        const SizedBox(height: 12),
+        const SizedBox(height: OneirSpace.md),
         OneirPrimaryButton(label: 'Send', onPressed: () => _submit()),
       ],
     );
@@ -380,26 +398,16 @@ class _InterventionConversationScreenState extends ConsumerState<InterventionCon
       backgroundColor: OneirColors.background,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (context) => Padding(
-        padding: EdgeInsets.fromLTRB(20, 20, 20, MediaQuery.of(context).viewInsets.bottom + 20),
+        padding: EdgeInsets.fromLTRB(
+            OneirSpace.xxl, OneirSpace.xxl, OneirSpace.xxl, MediaQuery.of(context).viewInsets.bottom + OneirSpace.xxl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('What do you still need to finish?',
-                style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, fontSize: 16, color: OneirColors.text)),
-            const SizedBox(height: 12),
-            TextField(
-              controller: extraController,
-              autofocus: true,
-              style: const TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 14),
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: OneirColors.inputFill,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-              ),
-            ),
-            const SizedBox(height: 14),
+            const Text('What do you still need to finish?', style: OneirText.title),
+            const SizedBox(height: OneirSpace.md),
+            OneirTextField(controller: extraController, autofocus: true),
+            const SizedBox(height: OneirSpace.lg),
             OneirPrimaryButton(
               label: 'Send',
               onPressed: () {
@@ -451,12 +459,12 @@ class _VoiceControlsRow extends ConsumerWidget {
         builder: (context, setSheetState) {
           var localRate = currentRate;
           return Padding(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 30),
+            padding: const EdgeInsets.fromLTRB(OneirSpace.xxl, OneirSpace.xxl, OneirSpace.xxl, OneirSpace.xxxl - 2),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Speaking speed', style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, fontSize: 16, color: OneirColors.text)),
+                const Text('Speaking speed', style: OneirText.title),
                 Slider(
                   value: localRate,
                   min: 0.2,
@@ -484,19 +492,19 @@ class _QuickReasonChips extends StatelessWidget {
     // no change here, only a new enum value + a new rule in
     // QuickReasonResponses.
     return Wrap(
-      spacing: 8,
-      runSpacing: 8,
+      spacing: OneirSpace.sm,
+      runSpacing: OneirSpace.sm,
       children: [
         for (final reason in QuickReason.values)
           Material(
             color: OneirColors.inputFill,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(OneirRadius.lg),
             child: InkWell(
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(OneirRadius.lg),
               onTap: () => onSelected(reason),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                child: Text(reason.label, style: const TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 12.5, color: OneirColors.text)),
+                padding: const EdgeInsets.symmetric(horizontal: OneirSpace.md + 2, vertical: OneirSpace.sm + 2),
+                child: Text(reason.label, style: OneirText.bodySmall.copyWith(fontWeight: FontWeight.w600, color: OneirColors.text)),
               ),
             ),
           ),
@@ -515,16 +523,16 @@ class _ChatBubble extends StatelessWidget {
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 4),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        margin: const EdgeInsets.symmetric(vertical: OneirSpace.xs),
+        padding: const EdgeInsets.symmetric(horizontal: OneirSpace.md + 2, vertical: OneirSpace.sm + 2),
         constraints: const BoxConstraints(maxWidth: 240),
         decoration: BoxDecoration(
-          color: isUser ? OneirColors.accent : OneirColors.cardNeutral,
-          borderRadius: BorderRadius.circular(14),
+          color: isUser ? OneirColors.accent : OneirColors.surfaceSunken,
+          borderRadius: BorderRadius.circular(OneirRadius.md),
         ),
         child: Text(
           turn.text,
-          style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 13, color: isUser ? Colors.white : OneirColors.text),
+          style: OneirText.bodySmall.copyWith(color: isUser ? Colors.white : OneirColors.text),
         ),
       ),
     );

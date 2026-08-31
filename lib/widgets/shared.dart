@@ -70,6 +70,78 @@ class OneirScaffold extends StatelessWidget {
   }
 }
 
+/// The standard content wrapper for a screen: [OneirScaffold] + SafeArea +
+/// the app's one consistent horizontal margin ([OneirSpace.screenMargin]).
+/// New/migrated screens should reach for this instead of hand-rolling their
+/// own Padding/SafeArea combination, so screen margins never drift between
+/// screens again.
+class OneirScreen extends StatelessWidget {
+  final Widget child;
+  final bool scrollable;
+  final EdgeInsets? padding;
+
+  const OneirScreen({super.key, required this.child, this.scrollable = false, this.padding});
+
+  @override
+  Widget build(BuildContext context) {
+    final effectivePadding = padding ??
+        const EdgeInsets.fromLTRB(OneirSpace.screenMargin, OneirSpace.xl, OneirSpace.screenMargin, OneirSpace.xxl);
+    return OneirScaffold(
+      child: SafeArea(
+        child: scrollable
+            ? SingleChildScrollView(padding: effectivePadding, child: child)
+            : Padding(padding: effectivePadding, child: child),
+      ),
+    );
+  }
+}
+
+/// The one reusable card surface for the whole app -- soft rounded
+/// corners, a hairline border, a restrained warm-tinted shadow, comfortable
+/// internal padding. Existing screens using a raw `Container` with their
+/// own one-off `BoxDecoration` should migrate to this so every card in the
+/// app reads as the same physical material.
+class OneirCard extends StatelessWidget {
+  final Widget child;
+  final EdgeInsetsGeometry padding;
+  final Color? color;
+  final double radius;
+  final VoidCallback? onTap;
+  final bool bordered;
+  final bool elevated;
+
+  const OneirCard({
+    super.key,
+    required this.child,
+    this.padding = const EdgeInsets.all(OneirSpace.xl),
+    this.color,
+    this.radius = OneirRadius.lg,
+    this.onTap,
+    this.bordered = true,
+    this.elevated = true,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final content = Container(
+      padding: padding,
+      decoration: BoxDecoration(
+        color: color ?? OneirColors.surface,
+        borderRadius: BorderRadius.circular(radius),
+        border: bordered ? Border.all(color: OneirColors.border) : null,
+        boxShadow: elevated ? OneirElevation.card : null,
+      ),
+      child: child,
+    );
+    if (onTap == null) return content;
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(radius),
+      child: InkWell(borderRadius: BorderRadius.circular(radius), onTap: onTap, child: content),
+    );
+  }
+}
+
 class OneirPrimaryButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
@@ -81,14 +153,13 @@ class OneirPrimaryButton extends StatelessWidget {
     final disabled = onPressed == null;
     return SizedBox(
       width: double.infinity,
-      height: 56,
+      height: 54,
       child: Material(
-        color: disabled ? const Color(0xFFE0E0E0) : OneirColors.accent,
-        borderRadius: BorderRadius.circular(28),
-        elevation: disabled ? 0 : 3,
-        shadowColor: OneirColors.accent.withOpacity(0.35),
+        color: disabled ? OneirColors.surfaceSunken : OneirColors.accent,
+        borderRadius: BorderRadius.circular(OneirRadius.xl),
+        elevation: 0,
         child: InkWell(
-          borderRadius: BorderRadius.circular(28),
+          borderRadius: BorderRadius.circular(OneirRadius.xl),
           onTap: onPressed,
           child: Center(
             child: Text(
@@ -114,16 +185,130 @@ class OneirSecondaryButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
+      height: 54,
       child: OutlinedButton(
         onPressed: onPressed,
         style: OutlinedButton.styleFrom(
           foregroundColor: OneirColors.text,
           side: const BorderSide(color: OneirColors.border),
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(OneirRadius.xl)),
         ),
-        child: Text(label, style: OneirText.button.copyWith(color: OneirColors.text)),
+        child: Text(label, style: OneirText.button.copyWith(color: OneirColors.text, fontWeight: FontWeight.w500)),
       ),
+    );
+  }
+}
+
+/// A quiet, text-only tertiary action -- for things like "Skip" or "Not
+/// now" that shouldn't compete visually with the primary/secondary
+/// buttons above them.
+class OneirTextButton extends StatelessWidget {
+  final String label;
+  final VoidCallback? onPressed;
+  const OneirTextButton({super.key, required this.label, required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      onPressed: onPressed,
+      style: TextButton.styleFrom(foregroundColor: OneirColors.textMuted),
+      child: Text(label, style: OneirText.bodySmall.copyWith(fontWeight: FontWeight.w600, color: OneirColors.textMuted)),
+    );
+  }
+}
+
+/// The app's one text-field style -- a soft warm-fill box, no visible
+/// border until focused, focus ring in the accent colour. Screens
+/// currently building their own `TextField`/`InputDecoration` inline
+/// should migrate to this.
+class OneirTextField extends StatelessWidget {
+  final TextEditingController controller;
+  final String? hintText;
+  final bool autofocus;
+  final int maxLines;
+  final TextAlign textAlign;
+  final ValueChanged<String>? onChanged;
+  final ValueChanged<String>? onSubmitted;
+  final Widget? suffix;
+
+  const OneirTextField({
+    super.key,
+    required this.controller,
+    this.hintText,
+    this.autofocus = false,
+    this.maxLines = 1,
+    this.textAlign = TextAlign.start,
+    this.onChanged,
+    this.onSubmitted,
+    this.suffix,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: controller,
+      autofocus: autofocus,
+      maxLines: maxLines,
+      textAlign: textAlign,
+      onChanged: onChanged,
+      onSubmitted: onSubmitted,
+      style: OneirText.bodyStrong,
+      cursorColor: OneirColors.accent,
+      decoration: InputDecoration(
+        hintText: hintText,
+        hintStyle: OneirText.body.copyWith(color: OneirColors.textFaint),
+        filled: true,
+        fillColor: OneirColors.inputFill,
+        suffixIcon: suffix,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(OneirRadius.md), borderSide: BorderSide.none),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(OneirRadius.md),
+          borderSide: const BorderSide(color: OneirColors.accent, width: 1.4),
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: OneirSpace.lg, vertical: OneirSpace.md + 2),
+      ),
+    );
+  }
+}
+
+/// The app's one switch style -- wraps Material's Switch with Vanya's
+/// accent colour so every toggle in the app (permissions, protected apps,
+/// settings) looks the same, instead of Android's default green/blue.
+class OneirSwitch extends StatelessWidget {
+  final bool value;
+  final ValueChanged<bool>? onChanged;
+  const OneirSwitch({super.key, required this.value, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    return Switch(
+      value: value,
+      onChanged: onChanged,
+      activeColor: Colors.white,
+      activeTrackColor: OneirColors.accent,
+      inactiveThumbColor: Colors.white,
+      inactiveTrackColor: OneirColors.borderStrong,
+      trackOutlineColor: const WidgetStatePropertyAll(Colors.transparent),
+    );
+  }
+}
+
+/// A tiny hand-drawn-feeling decorative mark -- a single soft dot in the
+/// accent's lightest tone. Meant to be sprinkled VERY sparingly (one or
+/// two per screen, near an illustration or a heading) to give the
+/// interface a touch of crafted personality without ever competing with
+/// content. Never a repeating pattern or a background texture.
+class OneirDot extends StatelessWidget {
+  final double size;
+  final Color? color;
+  const OneirDot({super.key, this.size = 6, this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(color: color ?? OneirColors.accentLine, shape: BoxShape.circle),
     );
   }
 }
@@ -189,26 +374,25 @@ class OneirSelectionRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: selected ? const Color(0xFFEAEAEA) : const Color(0xFFF5F5F7),
-      borderRadius: BorderRadius.circular(20),
+      color: selected ? OneirColors.accentSoft : OneirColors.surface,
+      borderRadius: BorderRadius.circular(OneirRadius.lg),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(OneirRadius.lg),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           curve: Curves.easeOut,
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: OneirSpace.xl, vertical: OneirSpace.lg),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: selected ? OneirColors.text : Colors.transparent, width: 1.5),
+            borderRadius: BorderRadius.circular(OneirRadius.lg),
+            border: Border.all(color: selected ? OneirColors.accent : OneirColors.border, width: selected ? 1.4 : 1),
           ),
           child: Row(
             children: [
-              if (leading != null) ...[leading!, const SizedBox(width: 14)],
-              Expanded(
-                child: Text(label, style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 15, fontWeight: FontWeight.w500, color: OneirColors.text)),
-              ),
+              if (leading != null) ...[leading!, const SizedBox(width: OneirSpace.md + 2)],
+              Expanded(child: Text(label, style: OneirText.bodyStrong)),
+              if (selected) const Icon(Icons.check_circle, size: 18, color: OneirColors.accent),
             ],
           ),
         ),
@@ -232,17 +416,17 @@ class OneirProgressHeader extends StatelessWidget {
       children: [
         GestureDetector(
           onTap: onBack,
-          child: Icon(Icons.arrow_back, size: 22, color: onBack == null ? Colors.transparent : OneirColors.text),
+          child: Icon(Icons.arrow_back, size: 20, color: onBack == null ? Colors.transparent : OneirColors.text),
         ),
-        const SizedBox(width: 14),
+        const SizedBox(width: OneirSpace.md + 2),
         Expanded(
           child: ClipRRect(
             borderRadius: BorderRadius.circular(3),
             child: LinearProgressIndicator(
               value: progress,
               minHeight: 4,
-              backgroundColor: const Color(0xFFE5E5E5),
-              valueColor: const AlwaysStoppedAnimation(OneirColors.text),
+              backgroundColor: OneirColors.border,
+              valueColor: const AlwaysStoppedAnimation(OneirColors.accent),
             ),
           ),
         ),
@@ -275,49 +459,51 @@ class OneirStreakWidgetCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final progress = totalDays == 0 ? 0.0 : currentDay / totalDays;
     return Material(
-      color: const Color(0xFFF5F5F7),
-      borderRadius: BorderRadius.circular(18),
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(OneirRadius.lg),
       child: InkWell(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(OneirRadius.lg),
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(OneirSpace.lg),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(18),
-            boxShadow: const [BoxShadow(color: Color(0x08000000), blurRadius: 8, offset: Offset(0, 2))],
+            color: OneirColors.surface,
+            borderRadius: BorderRadius.circular(OneirRadius.lg),
+            border: Border.all(color: OneirColors.border),
+            boxShadow: OneirElevation.subtle,
           ),
-      child: Stack(
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
+          child: Stack(
             children: [
-              Text(title, style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, fontSize: 13, color: OneirColors.text), maxLines: 1, overflow: TextOverflow.ellipsis),
-              const SizedBox(height: 6),
-              Text('$currentDay/$totalDays days', style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 11, color: OneirColors.textFaint)),
-              const SizedBox(height: 8),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(2),
-                child: LinearProgressIndicator(value: progress, minHeight: 3, backgroundColor: const Color(0xFFE5E5E5), valueColor: const AlwaysStoppedAnimation(OneirColors.text)),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(title, style: OneirText.title.copyWith(fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis),
+                  const SizedBox(height: OneirSpace.sm - 2),
+                  Text('$currentDay/$totalDays days', style: OneirText.caption),
+                  const SizedBox(height: OneirSpace.sm),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(2),
+                    child: LinearProgressIndicator(value: progress, minHeight: 3, backgroundColor: OneirColors.border, valueColor: const AlwaysStoppedAnimation(OneirColors.accent)),
+                  ),
+                ],
               ),
-            ],
-          ),
-          if (locked)
-            Positioned.fill(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(18),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 1.5, sigmaY: 1.5),
-                  child: Container(
-                    color: Colors.white.withOpacity(0.4),
-                    alignment: Alignment.center,
-                    child: const Icon(Icons.lock, size: 20, color: Colors.black45),
+              if (locked)
+                Positioned.fill(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(OneirRadius.lg),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 1.5, sigmaY: 1.5),
+                      child: Container(
+                        color: OneirColors.surface.withOpacity(0.55),
+                        alignment: Alignment.center,
+                        child: const Icon(Icons.lock_outline, size: 20, color: OneirColors.textMuted),
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-        ],
-      ),
+            ],
+          ),
         ),
       ),
     );
@@ -348,18 +534,14 @@ class OneirAssetPlaceholder extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: const Color(0xFFEDEDED),
-        borderRadius: borderRadius ?? BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFD0D0D0)),
+        color: OneirColors.surfaceSunken,
+        borderRadius: borderRadius ?? BorderRadius.circular(OneirRadius.md),
+        border: Border.all(color: OneirColors.border),
       ),
       alignment: Alignment.center,
       child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Text(
-          description,
-          textAlign: TextAlign.center,
-          style: const TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 11, color: Color(0xFF9A9A9A)),
-        ),
+        padding: const EdgeInsets.all(OneirSpace.md),
+        child: Text(description, textAlign: TextAlign.center, style: OneirText.caption),
       ),
     );
   }

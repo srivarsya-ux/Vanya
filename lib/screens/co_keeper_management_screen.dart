@@ -40,16 +40,17 @@ class _CoKeeperManagementScreenState extends State<CoKeeperManagementScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: OneirColors.background,
-        title: const Text('Remove Co-Keeper?', style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600)),
-        content: const Text(
+        backgroundColor: OneirColors.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(OneirRadius.lg)),
+        title: Text('Remove Co-Keeper?', style: OneirText.title),
+        content: Text(
           'This takes effect in 24 hours, and protected apps will be unlocked once it does. '
           'You can cancel any time before then.',
-          style: TextStyle(fontFamily: 'PlusJakartaSans'),
+          style: OneirText.body,
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Cancel', style: TextStyle(fontFamily: 'PlusJakartaSans'))),
-          TextButton(onPressed: () => Navigator.of(context).pop(true), child: const Text('Remove', style: TextStyle(fontFamily: 'PlusJakartaSans', color: Colors.red))),
+          TextButton(onPressed: () => Navigator.of(context).pop(false), child: Text('Cancel', style: OneirText.bodyStrong.copyWith(color: OneirColors.textMuted))),
+          TextButton(onPressed: () => Navigator.of(context).pop(true), child: const Text('Remove', style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, color: Colors.red))),
         ],
       ),
     );
@@ -69,46 +70,46 @@ class _CoKeeperManagementScreenState extends State<CoKeeperManagementScreen> {
         backgroundColor: OneirColors.background,
         elevation: 0,
         leading: IconButton(icon: const Icon(Icons.arrow_back, color: OneirColors.text), onPressed: () => Navigator.of(context).pop()),
-        title: const Text('Co-Keepers', style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, color: OneirColors.text)),
+        title: Text('Co-Keepers', style: OneirText.title),
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator(color: OneirColors.accent))
           : Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(OneirSpace.xl),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (_pairedId == null) ...[
                     const VanyaCharacter(expression: VanyaExpression.protecting, width: 180, height: 180),
-                    const SizedBox(height: 20),
-                    const Text('No Co-Keeper yet', style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, fontSize: 20, color: OneirColors.text)),
-                    const SizedBox(height: 8),
-                    const Text(
+                    const SizedBox(height: OneirSpace.xxl - 4),
+                    Text('No Co-Keeper yet', style: OneirText.heading.copyWith(fontSize: 20)),
+                    const SizedBox(height: OneirSpace.sm),
+                    Text(
                       "You haven't connected a Co-Keeper. Add one from onboarding, or invite someone now.",
-                      style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 14, color: OneirColors.textMuted, height: 1.5),
+                      style: OneirText.body,
                     ),
                   ] else ...[
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(color: OneirColors.cardNeutral, borderRadius: BorderRadius.circular(16)),
+                    OneirCard(
+                      padding: const EdgeInsets.all(OneirSpace.lg),
+                      color: OneirColors.surfaceSunken,
+                      elevated: false,
                       child: Row(
                         children: [
                           Container(
                             width: 44, height: 44,
-                            decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                            decoration: const BoxDecoration(color: OneirColors.surface, shape: BoxShape.circle),
                             alignment: Alignment.center,
-                            child: const Icon(Icons.check_circle, color: OneirColors.text),
+                            child: const Icon(Icons.check_circle, color: OneirColors.accentStrong),
                           ),
-                          const SizedBox(width: 14),
+                          const SizedBox(width: OneirSpace.md + 2),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(_removalPending ? 'Removal pending' : 'Connected',
-                                    style: const TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, fontSize: 15, color: OneirColors.text)),
+                                Text(_removalPending ? 'Removal pending' : 'Connected', style: OneirText.bodyStrong),
                                 Text(
                                   _removalPending ? 'Access restores automatically in 24 hours.' : 'Your Co-Keeper is holding your key.',
-                                  style: const TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 12, color: OneirColors.textFaint),
+                                  style: OneirText.caption,
                                 ),
                               ],
                             ),
@@ -116,22 +117,22 @@ class _CoKeeperManagementScreenState extends State<CoKeeperManagementScreen> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: OneirSpace.xl),
                     if (!_removalPending)
                       OneirSecondaryButton(label: 'Remove Co-Keeper', onPressed: _confirmRemoval)
                     else
                       OneirSecondaryButton(label: 'Cancel Removal', onPressed: () => setState(() => _removalPending = false)),
                   ],
-                  const SizedBox(height: 24),
-                  const Text('Recent approvals', style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, fontSize: 15, color: OneirColors.text)),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: OneirSpace.xxl),
+                  Text('Recent approvals', style: OneirText.bodyStrong),
+                  const SizedBox(height: OneirSpace.sm),
                   StreamBuilder<List<Map<String, dynamic>>>(
                     stream: CoKeeperBackend.watchPendingRequestsForMe(),
                     builder: (context, snapshot) {
                       final count = snapshot.data?.length ?? 0;
                       return Text(
                         count == 0 ? 'Nothing pending right now.' : '$count request${count == 1 ? '' : 's'} waiting on you.',
-                        style: const TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 13, color: OneirColors.textMuted),
+                        style: OneirText.bodySmall,
                       );
                     },
                   ),

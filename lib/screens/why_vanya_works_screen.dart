@@ -28,15 +28,14 @@ class WhyVanyaWorksScreen extends StatelessWidget {
     return OneirScaffold(
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(26, 20, 26, 24),
+          padding: const EdgeInsets.fromLTRB(OneirSpace.xxl, OneirSpace.xl, OneirSpace.xxl, OneirSpace.xxl),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               OneirProgressHeader(progress: 16 / 18, onBack: onBack),
-              const SizedBox(height: 16),
-              Text('Why Vanya works',
-                  style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, fontSize: 26, letterSpacing: -0.4, color: OneirColors.text)),
-              const SizedBox(height: 20),
+              const SizedBox(height: OneirSpace.lg),
+              Text('Why Vanya works', style: OneirText.heading.copyWith(fontSize: 26)),
+              const SizedBox(height: OneirSpace.xl),
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
@@ -48,30 +47,30 @@ class WhyVanyaWorksScreen extends StatelessWidget {
                           children: [
                             Container(
                               width: 38, height: 38,
-                              decoration: BoxDecoration(color: OneirColors.cardNeutral, borderRadius: BorderRadius.circular(10)),
+                              decoration: BoxDecoration(color: OneirColors.surfaceSunken, borderRadius: BorderRadius.circular(OneirRadius.sm)),
                               alignment: Alignment.center,
-                              child: Icon(p.icon, size: 18, color: OneirColors.text),
+                              child: Icon(p.icon, size: 18, color: OneirColors.accentStrong),
                             ),
-                            const SizedBox(width: 14),
+                            const SizedBox(width: OneirSpace.md + 2),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(p.title, style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, fontSize: 14.5, color: OneirColors.text)),
+                                  Text(p.title, style: OneirText.title.copyWith(fontSize: 14.5)),
                                   const SizedBox(height: 3),
-                                  Text(p.line, style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 13, height: 1.4, color: OneirColors.textMuted)),
+                                  Text(p.line, style: OneirText.body.copyWith(fontSize: 13)),
                                 ],
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: OneirSpace.xl),
                       ],
                     ],
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: OneirSpace.lg),
               OneirPrimaryButton(label: 'Continue', onPressed: onNext),
             ],
           ),

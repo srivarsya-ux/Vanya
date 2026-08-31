@@ -112,7 +112,10 @@ class _InterruptionScreenState extends State<InterruptionScreen> {
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return const Scaffold(backgroundColor: Colors.black26, body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(
+        backgroundColor: OneirColors.background,
+        body: Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(OneirColors.accent))),
+      );
     }
 
     // Tier 2 (intentionCheck) is the real, AI-backed conversation (voice +
@@ -129,14 +132,21 @@ class _InterruptionScreenState extends State<InterruptionScreen> {
       );
     }
 
+    // A warm, calm scrim rather than a harsh pure-black overlay -- this is a
+    // caring check-in, not a system alert.
     return Scaffold(
-      backgroundColor: Colors.black.withOpacity(0.55),
+      backgroundColor: OneirColors.text.withOpacity(0.45),
       body: Center(
         child: Container(
           width: 320,
           constraints: const BoxConstraints(maxHeight: 560),
-          padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 24),
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(28)),
+          padding: const EdgeInsets.symmetric(vertical: OneirSpace.xxl, horizontal: OneirSpace.xxl),
+          decoration: BoxDecoration(
+            color: OneirColors.surface,
+            borderRadius: BorderRadius.circular(OneirRadius.xl),
+            border: Border.all(color: OneirColors.border),
+            boxShadow: OneirElevation.card,
+          ),
           child: SingleChildScrollView(
             child: switch (_tier!) {
               _Tier.checkIn => _CheckInStage(onGoAnyway: _goAnyway, onStayHere: _stayHere),
@@ -163,11 +173,11 @@ class _CheckInStage extends StatelessWidget {
     // listen to any other question.
     return Column(mainAxisSize: MainAxisSize.min, children: [
       const VanyaCharacter(expression: VanyaExpression.listening, width: 170, height: 203),
-      const SizedBox(height: 16),
-      Text('Hey there.', textAlign: TextAlign.center, style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w500, fontSize: 18, color: OneirColors.text)),
-      const SizedBox(height: 20),
+      const SizedBox(height: OneirSpace.lg),
+      const Text('Hey there.', textAlign: TextAlign.center, style: OneirText.title),
+      const SizedBox(height: OneirSpace.xl),
       OneirPrimaryButton(label: 'Stay Here', onPressed: onStayHere),
-      const SizedBox(height: 10),
+      const SizedBox(height: OneirSpace.md),
       OneirSecondaryButton(label: 'Go Anyway', onPressed: onGoAnyway),
     ]);
   }
@@ -188,18 +198,17 @@ class _IntentionStage extends StatelessWidget {
     // them for it.
     return Column(mainAxisSize: MainAxisSize.min, children: [
       const VanyaCharacter(expression: VanyaExpression.thinking, width: 170, height: 203),
-      const SizedBox(height: 16),
+      const SizedBox(height: OneirSpace.lg),
       Text(
         hasIntention ? "Today's intention:\n$intention" : "You haven't set a task for today.",
         textAlign: TextAlign.center,
-        style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w500, fontSize: 18, color: OneirColors.text),
+        style: OneirText.title,
       ),
-      const SizedBox(height: 8),
-      Text('Would five more minutes on that help first?',
-          textAlign: TextAlign.center, style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 14, color: OneirColors.textFaint)),
-      const SizedBox(height: 20),
+      const SizedBox(height: OneirSpace.sm),
+      Text('Would five more minutes on that help first?', textAlign: TextAlign.center, style: OneirText.bodySmall),
+      const SizedBox(height: OneirSpace.xl),
       OneirPrimaryButton(label: 'Stay Here', onPressed: onStayHere),
-      const SizedBox(height: 10),
+      const SizedBox(height: OneirSpace.md),
       OneirSecondaryButton(label: 'Go Anyway', onPressed: onGoAnyway),
     ]);
   }
@@ -263,9 +272,9 @@ class _FullGateStageState extends State<_FullGateStage> {
   Widget build(BuildContext context) {
     return Column(mainAxisSize: MainAxisSize.min, children: [
       VanyaCharacter(expression: _expression(), width: 170, height: 203),
-      const SizedBox(height: 16),
-      Text(_headline(), textAlign: TextAlign.center, style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w500, fontSize: 18, color: OneirColors.text)),
-      const SizedBox(height: 20),
+      const SizedBox(height: OneirSpace.lg),
+      Text(_headline(), textAlign: TextAlign.center, style: OneirText.title),
+      const SizedBox(height: OneirSpace.xl),
       ..._buttons(),
     ]);
   }
@@ -323,7 +332,7 @@ class _FullGateStageState extends State<_FullGateStage> {
       case _RequestState.notSent:
         return [
           OneirPrimaryButton(label: 'Return to My Tasks', onPressed: widget.onReturnHome),
-          const SizedBox(height: 10),
+          const SizedBox(height: OneirSpace.md),
           OneirSecondaryButton(
             label: 'Request Key',
             // Ask what it's for before actually sending -- previously this
@@ -341,11 +350,11 @@ class _FullGateStageState extends State<_FullGateStage> {
               selected: _reason == r,
               onTap: () => setState(() => _reason = r),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: OneirSpace.md),
           ],
-          const SizedBox(height: 6),
+          const SizedBox(height: OneirSpace.xs),
           OneirPrimaryButton(label: 'Send Request', onPressed: _reason == null ? null : _requestKey),
-          const SizedBox(height: 10),
+          const SizedBox(height: OneirSpace.md),
           OneirSecondaryButton(label: 'Back', onPressed: () => setState(() => _state = _RequestState.notSent)),
         ];
       case _RequestState.noPairing:
@@ -355,7 +364,7 @@ class _FullGateStageState extends State<_FullGateStage> {
       case _RequestState.checkingPairing:
       case _RequestState.sending:
       case _RequestState.waiting:
-        return [const CircularProgressIndicator()];
+        return [const CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(OneirColors.accent))];
       case _RequestState.approved:
         return [OneirPrimaryButton(label: 'Continue', onPressed: () => OneirProtection.returnToOpenedApp())];
       case _RequestState.declined:

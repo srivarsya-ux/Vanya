@@ -17,18 +17,16 @@ class WidgetSetupScreen extends StatelessWidget {
     return OneirScaffold(
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(26, 20, 26, 24),
+          padding: const EdgeInsets.fromLTRB(OneirSpace.screenMargin, OneirSpace.xl, OneirSpace.screenMargin, OneirSpace.xxl),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               OneirProgressHeader(progress: 15 / 18, onBack: onBack),
-              const SizedBox(height: 16),
-              Text('One last thing.',
-                  style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, fontSize: 26, letterSpacing: -0.4, color: OneirColors.text)),
-              const SizedBox(height: 6),
-              Text("Let's put me somewhere you'll actually see me.",
-                  style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 14, color: OneirColors.textMuted)),
-              const SizedBox(height: 22),
+              const SizedBox(height: OneirSpace.lg),
+              Text('One last thing.', style: OneirText.heading.copyWith(fontSize: 26)),
+              const SizedBox(height: OneirSpace.sm - 2),
+              Text("Let's put me somewhere you'll actually see me.", style: OneirText.body),
+              const SizedBox(height: OneirSpace.xl),
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
@@ -37,34 +35,41 @@ class WidgetSetupScreen extends StatelessWidget {
                         title: "Today's Focus",
                         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                           _widgetLabel('TODAY'),
-                          const SizedBox(height: 8),
-                          _taskRow('Finish science assignment'),
-                          _taskRow('Practice piano'),
-                          _taskRow('Read 10 pages'),
+                          const SizedBox(height: OneirSpace.sm),
+                          // Placeholder rows, not invented specific tasks --
+                          // this screen runs during onboarding, before the
+                          // Tasks screen even exists to the user yet, so
+                          // there's no real task to show. Naming fake ones
+                          // ("Finish science assignment") read as if the app
+                          // already knew something about them; a plain
+                          // placeholder is honest about being a preview of
+                          // the widget's *shape*, not its content.
+                          _taskRow('Your first task will show up here'),
+                          _taskRowPlaceholder(),
+                          _taskRowPlaceholder(),
                         ]),
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: OneirSpace.md + 2),
                       _WidgetPreview(
                         title: 'Quick Focus',
                         child: Column(children: [
                           _widgetLabel('FOCUS'),
-                          const SizedBox(height: 4),
-                          Text('25 min', style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w700, fontSize: 18, color: OneirColors.text)),
+                          const SizedBox(height: OneirSpace.xs),
+                          Text('25 min', style: OneirText.title.copyWith(fontSize: 18, fontWeight: FontWeight.w700)),
                         ]),
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: OneirSpace.md + 2),
                       _WidgetPreview(
                         title: 'Vanya Daily Check-in',
                         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                          Text('Vanya', style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, fontSize: 13, color: OneirColors.text)),
-                          const SizedBox(height: 4),
-                          Text("What's one thing you want to get done today?",
-                              style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 12, color: OneirColors.textMuted)),
-                          const SizedBox(height: 8),
+                          Text('Vanya', style: OneirText.title.copyWith(fontSize: 13)),
+                          const SizedBox(height: OneirSpace.xs),
+                          Text("What's one thing you want to get done today?", style: OneirText.bodySmall.copyWith(fontSize: 12)),
+                          const SizedBox(height: OneirSpace.sm),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                            decoration: BoxDecoration(color: OneirColors.accent, borderRadius: BorderRadius.circular(16)),
-                            child: const Text('+ Add task', style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, fontSize: 11, color: Colors.white)),
+                            padding: const EdgeInsets.symmetric(horizontal: OneirSpace.md, vertical: OneirSpace.sm - 2),
+                            decoration: BoxDecoration(color: OneirColors.accent, borderRadius: BorderRadius.circular(OneirRadius.md)),
+                            child: Text('+ Add task', style: OneirText.caption.copyWith(fontWeight: FontWeight.w600, fontSize: 11, color: Colors.white)),
                           ),
                         ]),
                       ),
@@ -72,7 +77,7 @@ class WidgetSetupScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: OneirSpace.lg),
               OneirPrimaryButton(label: 'Continue', onPressed: onNext),
             ],
           ),
@@ -81,15 +86,25 @@ class WidgetSetupScreen extends StatelessWidget {
     );
   }
 
-  Widget _widgetLabel(String text) =>
-      Text(text, style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w700, fontSize: 10, letterSpacing: 0.6, color: OneirColors.textFaint));
+  Widget _widgetLabel(String text) => Text(text, style: OneirText.eyebrow.copyWith(fontSize: 10, letterSpacing: 0.6));
 
   Widget _taskRow(String label) => Padding(
-        padding: const EdgeInsets.only(bottom: 4),
+        padding: const EdgeInsets.only(bottom: OneirSpace.xs),
         child: Row(children: [
           Icon(Icons.circle_outlined, size: 12, color: OneirColors.border),
-          const SizedBox(width: 6),
-          Text(label, style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 12, color: OneirColors.text)),
+          const SizedBox(width: OneirSpace.sm - 2),
+          Text(label, style: OneirText.caption.copyWith(fontSize: 12, fontStyle: FontStyle.italic)),
+        ]),
+      );
+
+  /// An empty task row -- just the checkbox outline and a faint dashed
+  /// line standing in for text, rather than a second invented task name.
+  Widget _taskRowPlaceholder() => Padding(
+        padding: const EdgeInsets.only(bottom: OneirSpace.xs),
+        child: Row(children: [
+          Icon(Icons.circle_outlined, size: 12, color: OneirColors.border),
+          const SizedBox(width: OneirSpace.sm - 2),
+          Container(width: 90, height: 10, decoration: BoxDecoration(color: OneirColors.border, borderRadius: BorderRadius.circular(4))),
         ]),
       );
 }
@@ -104,12 +119,14 @@ class _WidgetPreview extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, fontSize: 12, color: OneirColors.textFaint)),
-        const SizedBox(height: 6),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(color: OneirColors.cardNeutral, borderRadius: BorderRadius.circular(18)),
+        Text(title, style: OneirText.eyebrow.copyWith(fontSize: 12, letterSpacing: 0)),
+        const SizedBox(height: OneirSpace.sm - 2),
+        OneirCard(
+          padding: const EdgeInsets.all(OneirSpace.md + 2),
+          color: OneirColors.surfaceSunken,
+          radius: OneirRadius.lg,
+          bordered: false,
+          elevated: false,
           child: child,
         ),
       ],

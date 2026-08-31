@@ -48,39 +48,32 @@ class _PermissionScreenState extends State<PermissionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return OneirScaffold(
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(26, 20, 26, 24),
-          child: Column(
-            children: [
-              OneirProgressHeader(progress: widget.progress, onBack: widget.onBack),
-              const Spacer(flex: 2),
-              Text(widget.emoji, style: const TextStyle(fontSize: 44)),
-              const SizedBox(height: 24),
-              Text(widget.question,
+    return OneirScreen(
+      child: Column(
+        children: [
+          OneirProgressHeader(progress: widget.progress, onBack: widget.onBack),
+          const Spacer(flex: 2),
+          Text(widget.emoji, style: const TextStyle(fontSize: 44)),
+          const SizedBox(height: OneirSpace.xxl),
+          Text(widget.question, textAlign: TextAlign.center, style: OneirText.heading.copyWith(height: 1.35)),
+          const SizedBox(height: OneirSpace.lg),
+          Text(widget.reason, textAlign: TextAlign.center, style: OneirText.body.copyWith(fontSize: 14, height: 1.6)),
+          const Spacer(flex: 3),
+          if (_denied)
+            Padding(
+              padding: const EdgeInsets.only(bottom: OneirSpace.md),
+              child: Text(
+                "That's okay -- you can allow this later in your phone's Settings.",
+                textAlign: TextAlign.center,
+                style: OneirText.bodySmall.copyWith(color: OneirColors.textFaint),
+              ),
+            ),
+          _allowed
+              ? Text('\u2713 Allowed',
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w500, fontSize: 24, letterSpacing: -0.4, height: 1.35, color: OneirColors.text)),
-              const SizedBox(height: 16),
-              Text(widget.reason,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 14, height: 1.6, color: OneirColors.textFaint)),
-              const Spacer(flex: 3),
-              if (_denied)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: Text(
-                    "That's okay -- you can allow this later in your phone's Settings.",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 13, color: OneirColors.textFaint),
-                  ),
-                ),
-              _allowed
-                  ? Text('\u2713 Allowed', textAlign: TextAlign.center, style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 14, fontWeight: FontWeight.w500, color: OneirColors.success))
-                  : OneirPrimaryButton(label: 'Allow', onPressed: _handleAllow),
-            ],
-          ),
-        ),
+                  style: OneirText.bodyStrong.copyWith(fontSize: 14, color: OneirColors.success))
+              : OneirPrimaryButton(label: 'Allow', onPressed: _handleAllow),
+        ],
       ),
     );
   }

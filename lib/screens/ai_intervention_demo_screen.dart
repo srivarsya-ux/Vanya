@@ -86,15 +86,15 @@ class _AiInterventionDemoScreenState extends State<AiInterventionDemoScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               OneirProgressHeader(progress: 7 / 18, onBack: widget.onBack),
-              const SizedBox(height: 24),
+              const SizedBox(height: OneirSpace.xxl),
               Text(
                 greeting,
-                style: const TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, fontSize: 26, color: OneirColors.text),
+                style: OneirText.heading,
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: OneirSpace.md),
               Text(
                 "This is the real Vanya -- not a script. Tap below, pretend you just opened a protected app, and say whatever you'd actually say. She'll answer for real.",
-                style: const TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 15, height: 1.5, color: OneirColors.textMuted),
+                style: OneirText.body,
               ),
               const Spacer(),
               // A real, expression-aware Vanya instead of a generic
@@ -115,7 +115,7 @@ class _AiInterventionDemoScreenState extends State<AiInterventionDemoScreen> {
                   height: 140,
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: OneirSpace.xxl),
               if (_tried) ...[
                 Center(
                   child: Text(
@@ -123,13 +123,13 @@ class _AiInterventionDemoScreenState extends State<AiInterventionDemoScreen> {
                         ? "That's what it feels like when Vanya thinks you have a real reason -- quick and no lecture."
                         : "That's what it feels like when Vanya gently redirects you -- still no lecture.",
                     textAlign: TextAlign.center,
-                    style: const TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 13, color: OneirColors.textFaint, fontStyle: FontStyle.italic),
+                    style: OneirText.bodySmall.copyWith(color: OneirColors.textFaint, fontStyle: FontStyle.italic),
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: OneirSpace.lg),
               ],
               OneirPrimaryButton(label: _tried ? 'Talk to her again' : 'Try it now', onPressed: _openDemo),
-              const SizedBox(height: 10),
+              const SizedBox(height: OneirSpace.sm + 2),
               OneirSecondaryButton(label: _tried ? 'Continue' : 'Skip for now', onPressed: widget.onNext),
             ],
           ),

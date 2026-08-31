@@ -94,21 +94,21 @@ class _InteractiveDemoScreenState extends State<InteractiveDemoScreen> {
           ImageFiltered(
             imageFilter: interrupted ? ImageFilter.blur(sigmaX: 6, sigmaY: 6) : ImageFilter.blur(sigmaX: 0, sigmaY: 0),
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 18, 20, 0),
+              padding: const EdgeInsets.fromLTRB(OneirSpace.xl, OneirSpace.lg + 2, OneirSpace.xl, 0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('10:30', style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 12, color: OneirColors.text)),
-                      Text('80%', style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 12, color: OneirColors.text)),
+                      Text('10:30', style: OneirText.caption.copyWith(fontSize: 12, letterSpacing: 0, color: OneirColors.text)),
+                      Text('80%', style: OneirText.caption.copyWith(fontSize: 12, letterSpacing: 0, color: OneirColors.text)),
                     ],
                   ),
-                  const SizedBox(height: 18),
-                  Text('Tue, 22 Jul', style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 12, color: OneirColors.textMuted)),
-                  Text('18\u00B0', style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 12, color: OneirColors.textMuted)),
-                  const SizedBox(height: 60),
+                  const SizedBox(height: OneirSpace.lg + 2),
+                  Text('Tue, 22 Jul', style: OneirText.caption.copyWith(fontSize: 12, letterSpacing: 0, color: OneirColors.textMuted)),
+                  Text('18\u00B0', style: OneirText.caption.copyWith(fontSize: 12, letterSpacing: 0, color: OneirColors.textMuted)),
+                  const SizedBox(height: OneirSpace.huge + 20),
                   Row(children: [
                     _AppIcon(label: 'Instagram', bg: const Color(0xFFDD2A7B), glyph: 'IG', onTap: _start),
                     const SizedBox(width: 28),
@@ -117,16 +117,16 @@ class _InteractiveDemoScreenState extends State<InteractiveDemoScreen> {
                     const _AppIcon(label: 'YouTube', bg: Color(0xFFFF0000), glyph: 'YT'),
                   ]),
                   if (!interrupted) ...[
-                    const SizedBox(height: 100),
+                    const SizedBox(height: OneirSpace.huge + 60),
                     Center(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        padding: const EdgeInsets.symmetric(horizontal: OneirSpace.md),
                         child: Text(
                           _reasonPhrase == 'do what matters most'
                               ? 'Try opening Instagram'
                               : "Because you want to $_reasonPhrase, try opening Instagram",
                           textAlign: TextAlign.center,
-                          style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 12, color: OneirColors.textFaint, fontStyle: FontStyle.italic),
+                          style: OneirText.caption.copyWith(fontSize: 12, letterSpacing: 0, fontStyle: FontStyle.italic),
                         ),
                       ),
                     ),
@@ -153,10 +153,10 @@ class _InteractiveDemoScreenState extends State<InteractiveDemoScreen> {
                 child: Center(
                   child: _lineIndex >= 0
                       ? Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          padding: const EdgeInsets.symmetric(horizontal: OneirSpace.xxl),
                           child: Text(_demoLines[_lineIndex],
                               textAlign: TextAlign.center,
-                              style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w500, fontSize: 20, color: OneirColors.text)),
+                              style: OneirText.heading.copyWith(fontSize: 20, fontWeight: FontWeight.w500)),
                         )
                       : null,
                 ),
@@ -167,7 +167,7 @@ class _InteractiveDemoScreenState extends State<InteractiveDemoScreen> {
               left: 56, top: 540, width: 240,
               child: Column(children: [
                 OneirPrimaryButton(label: 'Return to My Tasks', onPressed: widget.onNext),
-                const SizedBox(height: 10),
+                const SizedBox(height: OneirSpace.md - 2),
                 OneirSecondaryButton(label: 'Request Co-Keeper Key', onPressed: widget.onNext),
               ]),
             ),
@@ -191,12 +191,12 @@ class _AppIcon extends StatelessWidget {
       child: Column(children: [
         Container(
           width: 44, height: 44,
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), color: bg),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(OneirRadius.sm), color: bg),
           alignment: Alignment.center,
-          child: Text(glyph, style: const TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 18, fontWeight: FontWeight.w600, color: Colors.white)),
+          child: Text(glyph, style: OneirText.bodyStrong.copyWith(fontSize: 18, color: Colors.white)),
         ),
-        const SizedBox(height: 6),
-        Text(label, style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 10, color: OneirColors.textMuted)),
+        const SizedBox(height: OneirSpace.sm - 2),
+        Text(label, style: OneirText.caption.copyWith(fontSize: 10, letterSpacing: 0, color: OneirColors.textMuted)),
       ]),
     );
   }

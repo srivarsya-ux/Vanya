@@ -43,11 +43,11 @@ class _SplashScreenState extends State<SplashScreen> {
               child: Text(
                 'Vanya',
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontFamily: 'PlusJakartaSans',
+                style: OneirText.display.copyWith(
                   fontWeight: FontWeight.w500,
                   fontSize: 50,
                   height: 1,
+                  letterSpacing: 0,
                   color: OneirColors.splashWordmark,
                 ),
               ),

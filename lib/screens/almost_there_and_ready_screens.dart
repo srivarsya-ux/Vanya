@@ -15,7 +15,7 @@ class AlmostThereScreen extends StatelessWidget {
     return OneirScaffold(
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(26, 20, 26, 24),
+          padding: const EdgeInsets.fromLTRB(OneirSpace.screenMargin, OneirSpace.xl, OneirSpace.screenMargin, OneirSpace.xxl),
           child: Column(
             children: [
               OneirProgressHeader(progress: 17 / 18, onBack: onBack),
@@ -23,11 +23,9 @@ class AlmostThereScreen extends StatelessWidget {
               // Steady and supportive -- everything's checked off, one
               // step to go, not a celebration yet (that's ReadyScreen).
               const VanyaCharacter(expression: VanyaExpression.encouraging, width: 235, height: 235),
-              const SizedBox(height: 24),
-              Text('Almost there.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w500, fontSize: 26, letterSpacing: -0.5, color: OneirColors.text)),
-              const SizedBox(height: 12),
+              const SizedBox(height: OneirSpace.xxl),
+              Text('Almost there.', textAlign: TextAlign.center, style: OneirText.heading.copyWith(fontSize: 26, fontWeight: FontWeight.w500, letterSpacing: -0.5)),
+              const SizedBox(height: OneirSpace.md),
               const _ChecklistLine(label: 'Your name'),
               const _ChecklistLine(label: 'Protected apps'),
               const _ChecklistLine(label: 'Co-Keeper'),
@@ -49,13 +47,13 @@ class _ChecklistLine extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(vertical: OneirSpace.sm - 2),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.check_circle, size: 18, color: OneirColors.text),
-          const SizedBox(width: 8),
-          Text(label, style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 14, color: OneirColors.textMuted)),
+          const Icon(Icons.check_circle, size: 18, color: OneirColors.accent),
+          const SizedBox(width: OneirSpace.sm),
+          Text(label, style: OneirText.body.copyWith(fontSize: 14)),
         ],
       ),
     );
@@ -74,7 +72,7 @@ class ReadyScreen extends StatelessWidget {
     return OneirScaffold(
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(26, 20, 26, 24),
+          padding: const EdgeInsets.fromLTRB(OneirSpace.screenMargin, OneirSpace.xl, OneirSpace.screenMargin, OneirSpace.xxl),
           child: Column(
             children: [
               OneirProgressHeader(progress: 1.0, onBack: onBack),
@@ -84,14 +82,10 @@ class ReadyScreen extends StatelessWidget {
               // every other onboarding screen; now the one moment in the
               // whole flow that's genuinely a celebration looks like one.
               const VanyaCharacter(expression: VanyaExpression.proud, width: 255, height: 280),
-              const SizedBox(height: 28),
-              Text("You're all set.",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w500, fontSize: 28, letterSpacing: -0.5, color: OneirColors.text)),
-              const SizedBox(height: 12),
-              Text("Let's make today count.",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 15, height: 1.6, color: OneirColors.textMuted)),
+              const SizedBox(height: OneirSpace.xxl),
+              Text("You're all set.", textAlign: TextAlign.center, style: OneirText.heading.copyWith(fontSize: 28, fontWeight: FontWeight.w500, letterSpacing: -0.5)),
+              const SizedBox(height: OneirSpace.md),
+              Text("Let's make today count.", textAlign: TextAlign.center, style: OneirText.body.copyWith(fontSize: 15, height: 1.6)),
               const Spacer(flex: 3),
               OneirPrimaryButton(label: 'Start My Journey', onPressed: onNext),
             ],

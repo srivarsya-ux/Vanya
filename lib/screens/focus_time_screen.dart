@@ -100,7 +100,7 @@ class _FocusTimeScreenState extends ConsumerState<FocusTimeScreen> {
     OneirWidgetService.updateQuickFocus(isRunning: false, completed: true);
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Nice focus session.', style: TextStyle(fontFamily: 'PlusJakartaSans'))),
+        SnackBar(content: Text('Nice focus session.', style: OneirText.bodySmall.copyWith(color: Colors.white))),
       );
     }
   }
@@ -128,7 +128,7 @@ class _FocusTimeScreenState extends ConsumerState<FocusTimeScreen> {
         backgroundColor: OneirColors.background,
         elevation: 0,
         leading: IconButton(icon: const Icon(Icons.arrow_back, color: OneirColors.text), onPressed: () => Navigator.of(context).pop()),
-        title: const Text('Focus Time', style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, color: OneirColors.text)),
+        title: Text('Focus Time', style: OneirText.title),
       ),
       body: Center(
         child: _task == null ? _buildSetup() : _buildCountdown(),
@@ -138,33 +138,22 @@ class _FocusTimeScreenState extends ConsumerState<FocusTimeScreen> {
 
   Widget _buildSetup() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 28),
+      padding: const EdgeInsets.symmetric(horizontal: OneirSpace.xxl),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           const VanyaCharacter(expression: VanyaExpression.encouraging, width: 140, height: 140),
-          const SizedBox(height: 28),
-          const Text(
-            'What are you doing?',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, fontSize: 22, color: OneirColors.text),
-          ),
-          const SizedBox(height: 20),
-          TextField(
+          const SizedBox(height: OneirSpace.xxl),
+          Text('What are you doing?', textAlign: TextAlign.center, style: OneirText.heading.copyWith(fontSize: 22)),
+          const SizedBox(height: OneirSpace.xl),
+          OneirTextField(
             controller: _taskController,
             autofocus: true,
             textAlign: TextAlign.center,
+            hintText: 'e.g. Finish reading chapter 4',
             onSubmitted: (_) => _confirmTask(),
-            style: const TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 15, color: OneirColors.text),
-            decoration: InputDecoration(
-              hintText: 'e.g. Finish reading chapter 4',
-              filled: true,
-              fillColor: OneirColors.inputFill,
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: OneirSpace.xl),
           SizedBox(
             width: 220,
             child: OneirPrimaryButton(label: 'Continue', onPressed: _confirmTask),
@@ -180,16 +169,16 @@ class _FocusTimeScreenState extends ConsumerState<FocusTimeScreen> {
       mainAxisSize: MainAxisSize.min,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 40),
+          padding: const EdgeInsets.symmetric(horizontal: OneirSpace.huge),
           child: Text(
             _task!,
             textAlign: TextAlign.center,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w500, fontSize: 16, color: OneirColors.textMuted),
+            style: OneirText.bodyStrong.copyWith(fontSize: 16, fontWeight: FontWeight.w500, color: OneirColors.textMuted),
           ),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: OneirSpace.xl),
         SizedBox(
           width: 220,
           height: 220,
@@ -200,14 +189,14 @@ class _FocusTimeScreenState extends ConsumerState<FocusTimeScreen> {
               child: CircularProgressIndicator(
                 value: progress,
                 strokeWidth: 8,
-                backgroundColor: OneirColors.cardNeutral,
+                backgroundColor: OneirColors.surfaceSunken,
                 valueColor: const AlwaysStoppedAnimation(OneirColors.accent),
               ),
             ),
-            Text(_display, style: const TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w700, fontSize: 42, color: OneirColors.text)),
+            Text(_display, style: OneirText.display.copyWith(fontSize: 42, fontWeight: FontWeight.w700)),
           ]),
         ),
-        const SizedBox(height: 32),
+        const SizedBox(height: OneirSpace.xxxl),
         SizedBox(
           width: 220,
           child: OneirPrimaryButton(
@@ -216,11 +205,8 @@ class _FocusTimeScreenState extends ConsumerState<FocusTimeScreen> {
           ),
         ),
         if (_remainingSeconds != _totalSeconds) ...[
-          const SizedBox(height: 10),
-          TextButton(
-            onPressed: _reset,
-            child: Text('Reset', style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 13, color: OneirColors.textFaint)),
-          ),
+          const SizedBox(height: OneirSpace.sm + 2),
+          OneirTextButton(label: 'Reset', onPressed: _reset),
         ],
       ],
     );

@@ -1,9 +1,9 @@
 package com.oneir.app
 
 import android.accessibilityservice.AccessibilityService
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.preference.PreferenceManager
 import android.view.accessibility.AccessibilityEvent
 
 /**
@@ -53,7 +53,17 @@ class OneirAccessibilityService : AccessibilityService() {
     }
 
     private fun readProtectedApps(): Set<String> {
-        val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        // This was the actual bug behind "protecting an app does nothing":
+        // PreferenceManager.getDefaultSharedPreferences() opens a
+        // completely different file (<applicationId>_preferences) than the
+        // one Flutter's shared_preferences plugin actually writes to on
+        // Android (always literally named "FlutterSharedPreferences",
+        // regardless of applicationId). Reading the default-shared-prefs
+        // file here meant this always saw an empty/missing value, so
+        // `protectedApps` was silently empty for every app, every time --
+        // not something specific to SHEIN/Samsung apps/Phone/Photos, just
+        // total. Opening the same named file the plugin uses is the fix.
+        val prefs: SharedPreferences = getSharedPreferences("FlutterSharedPreferences", Context.MODE_PRIVATE)
         // shared_preferences (Flutter) stores string lists as a JSON-encoded string.
         val raw = prefs.getString(PREFS_KEY, null) ?: return emptySet()
         return try {

@@ -27,18 +27,18 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
         backgroundColor: OneirColors.background,
         elevation: 0,
         leading: IconButton(icon: const Icon(Icons.arrow_back, color: OneirColors.text), onPressed: () => Navigator.of(context).pop()),
-        title: const Text('Subscription', style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, color: OneirColors.text)),
+        title: const Text('Subscription', style: OneirText.title),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(OneirSpace.xl),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Choose your plan', style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, fontSize: 22, color: OneirColors.text)),
-            const SizedBox(height: 8),
-            const Text('Support Oneir and unlock the full Co-Keeper experience.',
-                style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 14, color: OneirColors.textFaint)),
-            const SizedBox(height: 24),
+            const Text('Choose your plan', style: OneirText.heading),
+            const SizedBox(height: OneirSpace.sm),
+            Text('Support Oneir and unlock the full Co-Keeper experience.',
+                style: OneirText.body.copyWith(color: OneirColors.textFaint)),
+            const SizedBox(height: OneirSpace.xxl),
             _PlanOption(
               label: 'Monthly',
               price: '\$4',
@@ -46,7 +46,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
               selected: _selected == 'monthly',
               onTap: () => setState(() => _selected = 'monthly'),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: OneirSpace.md),
             _PlanOption(
               label: 'Yearly',
               price: '\$40',
@@ -60,13 +60,13 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
               label: 'Subscribe',
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Payments are not wired up yet -- this is a UI placeholder.', style: TextStyle(fontFamily: 'PlusJakartaSans'))),
+                  SnackBar(content: Text('Payments are not wired up yet -- this is a UI placeholder.', style: OneirText.bodySmall.copyWith(color: Colors.white))),
                 );
               },
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: OneirSpace.md),
             const Center(
-              child: Text('Cancel anytime in Google Play', style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 12, color: OneirColors.textFaint)),
+              child: Text('Cancel anytime in Google Play', style: OneirText.caption),
             ),
           ],
         ),
@@ -95,16 +95,16 @@ class _PlanOption extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: selected ? const Color(0xFFEAEAEA) : OneirColors.cardNeutral,
-      borderRadius: BorderRadius.circular(18),
+      color: selected ? OneirColors.accentSoft : OneirColors.surface,
+      borderRadius: BorderRadius.circular(OneirRadius.lg),
       child: InkWell(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(OneirRadius.lg),
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.all(18),
+          padding: const EdgeInsets.all(OneirSpace.xl),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: selected ? OneirColors.text : Colors.transparent, width: 1.5),
+            borderRadius: BorderRadius.circular(OneirRadius.lg),
+            border: Border.all(color: selected ? OneirColors.accent : OneirColors.border, width: selected ? 1.4 : 1),
           ),
           child: Row(
             children: [
@@ -113,21 +113,21 @@ class _PlanOption extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(children: [
-                      Text(label, style: const TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, fontSize: 15, color: OneirColors.text)),
+                      Text(label, style: OneirText.bodyStrong.copyWith(fontWeight: FontWeight.w600)),
                       if (badge != null) ...[
-                        const SizedBox(width: 8),
+                        const SizedBox(width: OneirSpace.sm),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                          decoration: BoxDecoration(color: OneirColors.accent, borderRadius: BorderRadius.circular(10)),
-                          child: Text(badge!, style: const TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 10, fontWeight: FontWeight.w600, color: Colors.white)),
+                          padding: const EdgeInsets.symmetric(horizontal: OneirSpace.sm, vertical: 3),
+                          decoration: BoxDecoration(color: OneirColors.accent, borderRadius: BorderRadius.circular(OneirRadius.pill)),
+                          child: Text(badge!, style: OneirText.caption.copyWith(fontSize: 10, fontWeight: FontWeight.w600, color: Colors.white)),
                         ),
                       ],
                     ]),
                     const SizedBox(height: 4),
                     Text.rich(
                       TextSpan(children: [
-                        TextSpan(text: price, style: const TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w700, fontSize: 20, color: OneirColors.text)),
-                        TextSpan(text: ' $period', style: const TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 13, color: OneirColors.textFaint)),
+                        TextSpan(text: price, style: OneirText.title.copyWith(fontWeight: FontWeight.w700, fontSize: 20)),
+                        TextSpan(text: ' $period', style: OneirText.bodySmall.copyWith(color: OneirColors.textFaint)),
                       ]),
                     ),
                   ],
@@ -135,7 +135,7 @@ class _PlanOption extends StatelessWidget {
               ),
               Icon(
                 selected ? Icons.radio_button_checked : Icons.radio_button_off,
-                color: selected ? OneirColors.text : OneirColors.textFaint,
+                color: selected ? OneirColors.accent : OneirColors.textFaint,
               ),
             ],
           ),

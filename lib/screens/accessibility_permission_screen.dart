@@ -64,30 +64,22 @@ class _AccessibilityPermissionScreenState extends State<AccessibilityPermissionS
 
   @override
   Widget build(BuildContext context) {
-    return OneirScaffold(
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(26, 20, 26, 24),
-          child: Column(
-            children: [
-              OneirProgressHeader(progress: 13 / 18, onBack: widget.onBack),
-              const Spacer(flex: 2),
-              const Text('\u{1F511}', style: TextStyle(fontSize: 44)), // TODO: swap for a real Vanya illustration
-              const SizedBox(height: 24),
-              Text('May I help keep your promises?',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w500, fontSize: 24, letterSpacing: -0.4, height: 1.35, color: OneirColors.text)),
-              const SizedBox(height: 16),
-              Text('So protected apps actually stay protected. This is turned on in your phone Settings, under Accessibility.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 14, height: 1.6, color: OneirColors.textFaint)),
-              const Spacer(flex: 3),
-              _checking
-                  ? const CircularProgressIndicator()
-                  : OneirPrimaryButton(label: 'Open Settings', onPressed: _openSettings),
-            ],
-          ),
-        ),
+    return OneirScreen(
+      child: Column(
+        children: [
+          OneirProgressHeader(progress: 13 / 18, onBack: widget.onBack),
+          const Spacer(flex: 2),
+          const Text('\u{1F511}', style: TextStyle(fontSize: 44)), // TODO: swap for a real Vanya illustration
+          const SizedBox(height: OneirSpace.xxl),
+          Text('May I help keep your promises?', textAlign: TextAlign.center, style: OneirText.heading.copyWith(height: 1.35)),
+          const SizedBox(height: OneirSpace.lg),
+          Text('So protected apps actually stay protected. This is turned on in your phone Settings, under Accessibility.',
+              textAlign: TextAlign.center, style: OneirText.body.copyWith(fontSize: 14, height: 1.6)),
+          const Spacer(flex: 3),
+          _checking
+              ? const CircularProgressIndicator(color: OneirColors.accent)
+              : OneirPrimaryButton(label: 'Open Settings', onPressed: _openSettings),
+        ],
       ),
     );
   }

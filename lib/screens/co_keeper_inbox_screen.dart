@@ -18,24 +18,50 @@ class CoKeeperInboxScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: OneirColors.background,
         elevation: 0,
-        title: Text('Co-Keeper requests', style: TextStyle(fontFamily: 'PlusJakartaSans', color: OneirColors.text, fontWeight: FontWeight.w600)),
+        title: Text('Co-Keeper requests', style: OneirText.title),
       ),
       body: StreamBuilder<List<Map<String, dynamic>>>(
         stream: CoKeeperBackend.watchPendingRequestsForMe(),
         builder: (context, snapshot) {
+          // This used to spin forever with no way out whenever the stream
+          // never emitted -- most commonly because Firebase isn't
+          // configured yet on this build (see main.dart's
+          // Firebase.initializeApp() catch block and SETUP.md section 4),
+          // in which case Firestore calls here just never resolve. An
+          // honest message beats an infinite spinner either way, whether
+          // the real cause is that or something else.
+          if (snapshot.hasError) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(OneirSpace.xxl),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.cloud_off_outlined, size: 28, color: OneirColors.textFaint),
+                    const SizedBox(height: OneirSpace.md),
+                    Text(
+                      "Couldn't load Co-Keeper requests. This usually means Oneir's backend isn't set up yet on this build (see SETUP.md).",
+                      textAlign: TextAlign.center,
+                      style: OneirText.bodySmall.copyWith(color: OneirColors.textFaint),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
           if (!snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator(color: OneirColors.accent));
           }
           final requests = snapshot.data!;
           if (requests.isEmpty) {
             return Center(
-              child: Text('No pending requests', style: TextStyle(fontFamily: 'PlusJakartaSans', color: OneirColors.textFaint)),
+              child: Text('No pending requests', style: OneirText.bodySmall.copyWith(color: OneirColors.textFaint)),
             );
           }
           return ListView.separated(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(OneirSpace.xl),
             itemCount: requests.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 12),
+            separatorBuilder: (_, __) => const SizedBox(height: OneirSpace.md),
             itemBuilder: (context, i) => _RequestCard(request: requests[i]),
           );
         },
@@ -69,25 +95,23 @@ class _RequestCardState extends State<_RequestCard> {
     final reason = widget.request['reason'] as String? ?? '';
     final duration = widget.request['durationMinutes'] as int? ?? 15;
 
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(color: OneirColors.cardNeutral, borderRadius: BorderRadius.circular(20)),
+    return OneirCard(
+      padding: const EdgeInsets.all(OneirSpace.lg + 2),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text('$name wants to unlock $appPackage',
-            style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, fontSize: 15, color: OneirColors.text)),
+        Text('$name wants to unlock $appPackage', style: OneirText.bodyStrong),
         if (reason.isNotEmpty) ...[
-          const SizedBox(height: 6),
-          Text('Reason: $reason', style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 13, color: OneirColors.textMuted)),
+          const SizedBox(height: OneirSpace.xs + 2),
+          Text('Reason: $reason', style: OneirText.bodySmall),
         ],
-        const SizedBox(height: 6),
-        Text('Requesting $duration minutes', style: TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 12, color: OneirColors.textFaint)),
-        const SizedBox(height: 14),
+        const SizedBox(height: OneirSpace.xs + 2),
+        Text('Requesting $duration minutes', style: OneirText.caption),
+        const SizedBox(height: OneirSpace.md + 2),
         if (_responding)
-          const Center(child: CircularProgressIndicator())
+          const Center(child: CircularProgressIndicator(color: OneirColors.accent))
         else
           Row(children: [
             Expanded(child: OneirPrimaryButton(label: 'Approve', onPressed: () => _respond(true))),
-            const SizedBox(width: 10),
+            const SizedBox(width: OneirSpace.sm + 2),
             Expanded(child: OneirSecondaryButton(label: 'Decline', onPressed: () => _respond(false))),
           ]),
       ]),

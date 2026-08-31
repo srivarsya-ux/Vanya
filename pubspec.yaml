@@ -47,6 +47,7 @@ flutter:
     - assets/images/icons/
     - assets/images/poses/
     - assets/images/vanya_face/
+    - assets/images/vanya_speaking/
   fonts:
     - family: PlusJakartaSans
       fonts:

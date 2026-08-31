@@ -33,35 +33,37 @@ extension MouthCueShapeLabel on MouthCueShape {
   }
 }
 
-/// Maps each cue shape to the real Vanya artwork in
-/// assets/images/vanya_face/ (see VanyaTalkingCharacter, which now
-/// displays this asset per shape instead of driving VanyaFacePainter's
-/// vector mouth -- that painter and its continuous MouthParams table are
-/// unused now but left in place rather than deleted, same as other
-/// superseded implementations in this project).
+/// Maps each cue shape to the illustrated bunny mouth art in
+/// assets/images/vanya_speaking/ -- see VanyaTalkingCharacter, which draws
+/// this as a small overlay positioned on top of the bunny body art, not as
+/// a full-face photo swap like the earlier version. This replaced a set of
+/// photo-realistic face-crop images (assets/images/vanya_face/, still in
+/// the repo, unused, same convention as other superseded assets in this
+/// project) that looked like a completely different character from the
+/// hand-drawn bunny used everywhere else in the app -- this is what makes
+/// the AI conversation screen finally look like the same Vanya.
 ///
-/// The mapping follows this file's own doc comment above (closed -> rest,
-/// a -> wide-open "ah", b -> slightly open, c -> mid-open, d -> rounded
-/// "oh") using the closest real photo for each. There's no distinct
-/// "tight rounded/puckered" photo for `ef` in the source set, so it
-/// reuses the `d` ("oh") shape -- the closest available rounded mouth --
-/// rather than inventing a sixth image; a real `ef`/"oo" photo would be a
-/// clean drop-in if one ever gets drawn.
+/// The source set has 4 distinct speaking mouth shapes (plus an unused
+/// `sad` resting expression, not part of this cycle) -- `a` (wide-open
+/// "ah") and `d`/`ef` (rounded "oh"/puckered) all share
+/// `mouth_oshaped.png`, and `c` (mid-open, relaxed) shares `b`'s
+/// `mouth_half_open.png`, same sharing pattern this mapping already used
+/// before (`ef` reused `d`).
 extension MouthCueShapeAsset on MouthCueShape {
   String get assetPath {
     switch (this) {
       case MouthCueShape.closed:
-        return 'assets/images/vanya_face/vanya_mouth_closed.jpg';
+        return 'assets/images/vanya_speaking/mouth_neutral.png';
       case MouthCueShape.a:
-        return 'assets/images/vanya_face/vanya_mouth_wide.jpg';
+        return 'assets/images/vanya_speaking/mouth_oshaped.png';
       case MouthCueShape.b:
-        return 'assets/images/vanya_face/vanya_mouth_half_open.jpg';
+        return 'assets/images/vanya_speaking/mouth_half_open.png';
       case MouthCueShape.c:
-        return 'assets/images/vanya_face/vanya_mouth_open.jpg';
+        return 'assets/images/vanya_speaking/mouth_half_open.png';
       case MouthCueShape.d:
-        return 'assets/images/vanya_face/vanya_mouth_o.jpg';
+        return 'assets/images/vanya_speaking/mouth_oshaped.png';
       case MouthCueShape.ef:
-        return 'assets/images/vanya_face/vanya_mouth_o.jpg';
+        return 'assets/images/vanya_speaking/mouth_oshaped.png';
     }
   }
 }

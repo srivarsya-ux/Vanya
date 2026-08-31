@@ -18,10 +18,10 @@ class SettingsScreen extends StatelessWidget {
         backgroundColor: OneirColors.background,
         elevation: 0,
         leading: IconButton(icon: const Icon(Icons.arrow_back, color: OneirColors.text), onPressed: () => Navigator.of(context).pop()),
-        title: const Text('Settings', style: TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, color: OneirColors.text)),
+        title: const Text('Settings', style: OneirText.title),
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+        padding: const EdgeInsets.fromLTRB(OneirSpace.xl, OneirSpace.sm, OneirSpace.xl, OneirSpace.xxl),
         children: [
           _SettingsRow(
             icon: Icons.diversity_1_outlined,
@@ -75,38 +75,31 @@ class _SettingsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Material(
-        color: OneirColors.cardNeutral,
-        borderRadius: BorderRadius.circular(18),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(18),
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Container(
-                  width: 44, height: 44,
-                  decoration: BoxDecoration(color: OneirColors.background, borderRadius: BorderRadius.circular(12)),
-                  alignment: Alignment.center,
-                  child: Icon(icon, size: 22, color: OneirColors.text),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(title, style: const TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w600, fontSize: 15, color: OneirColors.text)),
-                      const SizedBox(height: 2),
-                      Text(subtitle, style: const TextStyle(fontFamily: 'PlusJakartaSans', fontSize: 12, color: OneirColors.textFaint)),
-                    ],
-                  ),
-                ),
-                const Icon(Icons.chevron_right, color: OneirColors.textFaint),
-              ],
+      padding: const EdgeInsets.only(bottom: OneirSpace.md),
+      child: OneirCard(
+        padding: const EdgeInsets.all(OneirSpace.lg),
+        onTap: onTap,
+        child: Row(
+          children: [
+            Container(
+              width: 44, height: 44,
+              decoration: BoxDecoration(color: OneirColors.background, borderRadius: BorderRadius.circular(OneirRadius.sm)),
+              alignment: Alignment.center,
+              child: Icon(icon, size: 22, color: OneirColors.text),
             ),
-          ),
+            const SizedBox(width: OneirSpace.md + 2),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: OneirText.bodyStrong.copyWith(fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 2),
+                  Text(subtitle, style: OneirText.caption),
+                ],
+              ),
+            ),
+            const Icon(Icons.chevron_right, color: OneirColors.textFaint),
+          ],
         ),
       ),
     );
