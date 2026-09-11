@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="vanya_accessibility_service_description">Lets Vanya notice when a protected app opens, so it can step in with the interruption you set up. Vanya does not read or store what you type.</string>
+</resources>
