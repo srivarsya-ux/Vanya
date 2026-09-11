@@ -75,8 +75,8 @@ class VanyaColors extends ThemeExtension<VanyaColors> {
     textSecondary: Color(0xFF6E6152),
     textTertiary: Color(0xFF9C9080),
     textOnAccent: Color(0xFFFBF5EA),
-    accent: Color(0xFFBF7A4A),
-    accentMuted: Color(0x24BF7A4A), // ~14% opacity
+    accent: Color(0xFF1C1712),
+    accentMuted: Color(0x241C1712), // ~14% opacity
     gentle: Color(0xFF7C8F6B),
     gentleMuted: Color(0x247C8F6B),
     notice: Color(0xFFB08A3E),
@@ -101,8 +101,8 @@ class VanyaColors extends ThemeExtension<VanyaColors> {
     textSecondary: Color(0xFFB9AC98),
     textTertiary: Color(0xFF8A7E6E),
     textOnAccent: Color(0xFFFBF5EA),
-    accent: Color(0xFFD79A6C),
-    accentMuted: Color(0x2ED79A6C), // ~18% opacity
+    accent: Color(0xFFF4ECDF),
+    accentMuted: Color(0x2EF4ECDF), // ~18% opacity
     gentle: Color(0xFF9BAE8A),
     gentleMuted: Color(0x2E9BAE8A),
     notice: Color(0xFFD1A85C),

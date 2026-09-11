@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import '../design_system/vanya_colors.dart';
 import '../design_system/vanya_spacing.dart';
 import '../design_system/vanya_typography.dart';
+import '../features/home/home_screen.dart';
+import '../features/onboarding/onboarding_flow.dart';
 import '../widgets/vanya_glass_button.dart';
 import '../widgets/vanya_glass_card.dart';
 import '../widgets/vanya_glass_chip.dart';
@@ -82,6 +84,22 @@ class _DesignSystemShowcaseScreenState extends State<DesignSystemShowcaseScreen>
                 Text(
                   'Every token and glass component on one screen, over a stand-in illustrated backdrop.',
                   style: VanyaTypography.secondary.copyWith(color: colors.textSecondary),
+                ),
+                const SizedBox(height: VanyaSpacing.lg),
+                VanyaGlassButton(
+                  label: 'Preview: Onboarding flow',
+                  icon: Icons.arrow_forward_rounded,
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const OnboardingFlow()),
+                  ),
+                ),
+                const SizedBox(height: VanyaSpacing.sm),
+                VanyaGlassButton(
+                  label: 'Preview: Home (functional core)',
+                  icon: Icons.arrow_forward_rounded,
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const HomeScreen()),
+                  ),
                 ),
                 const SizedBox(height: VanyaSpacing.xxl),
 
